@@ -1,1 +1,39 @@
 /* You can add global styles to this file, and also import other style files */
+@import "./assets/css/fonts.css";
+
+*, body {font-family: 'DM Sans', "Helvetica Neue", sans-serif; }
+
+body {margin:0; padding:0; color:#ffffff;}
+
+a {
+    text-decoration: none;
+    color:white;
+}
+
+button {
+    padding: 12px 24px;
+    border-radius: 40px;
+    background-color: #2e3edf;
+    color: white;
+    outline: unset;
+    border: unset;
+    cursor: pointer;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 23.44px;
+    text-align: left;
+    transition: background-color 125ms ease-in-out;
+    &:hover {
+        background-color: #3f4de6;
+    }
+  }
+
+  .max-width {
+    max-width: 1440px;
+    width: 100%;
+    padding: 10px 96px;
+  }
+
+
+
+
