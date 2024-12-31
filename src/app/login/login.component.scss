@@ -1,0 +1,89 @@
+.login {
+  height: 100vh;
+  background-image: linear-gradient(
+      180deg,
+      #000000 -19.89%,
+      rgba(0, 0, 0, 0.55) 40.46%,
+      #000000 100%
+    ),
+    url("../../assets/img/background/login.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
+  display: flex;
+  justify-content: center;
+}
+
+.vertical-center {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.card {
+  max-width: 520px;
+  width: 100%;
+  padding: 43px 56px;
+  gap: 32px;
+  border-radius: 48px;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  gap: 32px;
+  box-sizing: border-box;
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    color: black;
+
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 19.2px;
+  }
+
+  input {
+    border: 1px solid #2e3edf;
+    padding: 12px 24px;
+    gap: 10px;
+    border-radius: 12px;
+  }
+
+  input::placeholder {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23.44px;
+    text-align: left;
+    color: #2e3edf;
+  }
+
+  h2 {
+    color: #2e3edf;
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 62.5px;
+    text-align: center;
+    margin: 0;
+  }
+}
+
+.card-bottom {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: black;
+  gap: 16px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 23.44px;
+
+  a {
+    color: #2e3edf;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 23.44px;
+  }
+}
