@@ -1,0 +1,89 @@
+.container {
+  position: relative;
+  width: 100%;
+//   height: 100vh;
+  background-color: black;
+}
+
+video {
+  display: block;
+  width: 100%;
+  height: auto;  
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  transition: 0.5s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+//   cursor: pointer;
+  img {
+    cursor: pointer;
+  }
+}
+
+.container:hover .overlay {
+  opacity: 1;
+}
+
+.text {
+  color: white;
+  font-size: 20px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.topIcons {
+  max-height: 108px;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  padding: 10px 32px 10px 32px;
+  gap: 16px;
+}
+
+.bottomIcons {
+  max-height: 108px;
+  height: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.6) 100%
+  );
+  padding: 10px 32px 10px 32px;
+  gap: 16px;
+}
+
+.leftIcons,
+.rightIcons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  img {
+    width: 48px;
+    height: 48px;
+  }
+}
