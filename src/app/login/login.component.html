@@ -5,7 +5,16 @@
       <h2>Log in</h2>
       <form action="">
         <input type="email" name="" id="" placeholder="Email Address"/>
-        <input type="password" name="" id="" placeholder ="Password" />
+        <div class="password-container">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            placeholder="Enter a Password" 
+            [(ngModel)]="password"
+            name="password"
+          />
+          <img *ngIf="!showPassword" src="../../assets/img/icons/visibility.png" alt="" (click)="togglePasswordVisibility()" >
+          <img *ngIf="showPassword" src="../../assets/img/icons/visibility_off.png" alt="" (click)="togglePasswordVisibility()" />  
+        </div>
         <label><input type="checkbox" name="" id="" /> Remember me</label>
         
       </form>
