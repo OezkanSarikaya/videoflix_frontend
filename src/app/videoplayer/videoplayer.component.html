@@ -1,62 +1,15 @@
-
 <div class="container">
-
-  <video class="trailer" #videoPlayer>
-    <source src="../../assets/video-trailer/escape.mp4" type="video/mp4" />
+  <video
+    #videoPlayer
+    (timeupdate)="updateSeekbar()"
+    (loadedmetadata)="onMetadataLoaded()"
+  >
+    <!-- <source src="../../assets/video-trailer/escape.mp4" type="video/mp4" /> -->
+    <source src="../../assets/video-trailer/23592-337668424.mp4" type="video/mp4" />
   </video>
 
-  <div class="overlay" (click)="toggleVideo()">
-
-    <div class="topIcons">
-        <div class="topLeftIcons">
-          <img src="../../assets/img/icons/arrow_back.png" alt="" />
-        </div>
-        <div class="topMiddleText">Optimizing video for your screen 40%</div>
-        <div class="topRightIcons">
-          <img src="../../assets/img/icons/logo-icon.png" alt="" />
-        </div>
-      </div>
-
-    <div class="bottomIcons">
-        <div class="leftIcons">
-          <img src="../../assets/img/icons/play_arrow.png" alt="" />
-          <img src="../../assets/img/icons/replay_10.png" alt="" />
-          <img src="../../assets/img/icons/forward_10.png" alt="" />
-          <img src="../../assets/img/icons/volume_up.png" alt="" />
-        </div>
-        <div class="middleTitle">Majestic Whales</div>
-        <div class="rightIcons">
-          <img src="../../assets/img/icons/subtitles.png" alt="" />
-          <img src="../../assets/img/icons/speed.png" alt="" />
-          <img src="../../assets/img/icons/fullscreen.png" alt="" />
-        </div>
-      </div>
-
-  </div>
-</div>
-
-
-<!-- <div class="wrapper">
-  <div class="videoContent">
-    <div class="demoBox">
-      <video class="trailer" #videoPlayer (click)="toggleVideo()">
-        <source src="../../assets/video-trailer/escape.mp4" type="video/mp4" />
-      </video>
-    </div>
-  </div>
-</div> -->
-
-<!-- <video
-    width="80%"
-    height="80%"
-    class="trailer"
-    #videoPlayer
-    (click)="toggleVideo()"
-  >
-    <source src="../../assets/video-trailer/escape.mp4" type="video/mp4" />
-  </video> -->
-
-<!-- <div class="videoWrapper">
+  <!-- <div class="overlay" (click)="toggleVideo()"> -->
+    <div class="overlay">
     <div class="topIcons">
       <div class="topLeftIcons">
         <img src="../../assets/img/icons/arrow_back.png" alt="" />
@@ -66,25 +19,32 @@
         <img src="../../assets/img/icons/logo-icon.png" alt="" />
       </div>
     </div>
-
-    <div class="bottomIcons">
-      <div class="leftIcons">
-        <img src="../../assets/img/icons/play_arrow.png" alt="" />
-        <img src="../../assets/img/icons/replay_10.png" alt="" />
-        <img src="../../assets/img/icons/forward_10.png" alt="" />
-        <img src="../../assets/img/icons/volume_up.png" alt="" />
+    <div class="bottom-controls">
+      <div class="custom-controls">
+        <input
+          type="range"
+          #seekbar
+          [value]="seekbarValue"
+          (input)="onSeek($event)"
+          step="0.1"
+        />
+        <span class="video-duration">{{ videoDuration }}</span>
       </div>
-      <div class="middleTitle">Majestic Whales</div>
-      <div class="rightIcons">
-        <img src="../../assets/img/icons/subtitles.png" alt="" />
-        <img src="../../assets/img/icons/speed.png" alt="" />
-        <img src="../../assets/img/icons/fullscreen.png" alt="" />
+      <div class="bottomIcons">
+        <div class="leftIcons">
+          <img  *ngIf="videoPlayer.paused" src="../../assets/img/icons/play_arrow.png" alt="" (click)="toggleVideo()" />
+          <img *ngIf="!videoPlayer.paused" src="../../assets/img/icons/pause.png" alt="" (click)="toggleVideo()" />
+          <img src="../../assets/img/icons/replay_10.png" alt="" (click)="rewind(10)" />
+          <img src="../../assets/img/icons/forward_10.png" alt="" (click)="forward(10)" />
+          <img src="../../assets/img/icons/volume_up.png" alt="" />
+        </div>
+        <div class="middleTitle">Majestic Whales</div>
+        <div class="rightIcons">
+          <img src="../../assets/img/icons/subtitles.png" alt="" />
+          <img src="../../assets/img/icons/speed.png" alt="" />
+          <img src="../../assets/img/icons/fullscreen.png" alt="" (click)="toggleFullscreen()"/>
+        </div>
       </div>
     </div>
   </div>
-</div> -->
-
-<!-- <button (click)="toggleVideo()">
-  {{ videoPlayer.paused = "Play" : "Pause" }}
-  Play / Pause
-</button> -->
+</div>
