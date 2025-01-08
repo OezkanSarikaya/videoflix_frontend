@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../environment/environment';
 import { Router } from '@angular/router';
@@ -17,6 +17,12 @@ export class AuthService {
   // Methode zum sicheren Zugriff auf localStorage
   private get isBrowser(): boolean {
     return typeof window !== 'undefined';
+  }
+
+  activateAccount(uid: string, token: string): Observable<any> {
+    const url = `${this.apiUrl}/api/users/activate/${uid}/${token}/`; // URL zusammenstellen
+    console.log('Sending GET request to:', url);
+    return this.http.get(url); // GET-Request ohne Payload
   }
 
   // Login-Methode

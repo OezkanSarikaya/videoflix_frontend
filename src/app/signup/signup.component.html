@@ -1,40 +1,74 @@
 <main class="signup">
-    <div class="max-width vertical-center">
-      <app-header></app-header>
-      <div class="card">
-        <h2>Sign up</h2>
-        <form action="">
-          <input class="input" type="email" name="" id="" placeholder="Email Address"/>       
+  <div class="max-width vertical-center">
+    <app-header></app-header>
+    <div class="card">
+      <h2>Sign up</h2>
+      <!-- Erfolgs-/Fehlermeldung anzeigen -->
+      <div *ngIf="showSuccessMessage" class="success-message">
+        <p>
+          An email has been sent to you. Please check your inbox to confirm your
+          registration.
+        </p>
+      </div>
+      <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+      <form *ngIf="!showSuccessMessage" (ngSubmit)="signup()">
+        <input
+          class="input"
+          type="email"
+          [(ngModel)]="email"
+          name="email"
+          placeholder="Email Address"
+          required
+        />
 
-          <div class="password-container">
-            <input 
-              [type]="showPassword ? 'text' : 'password'" 
-              placeholder="Enter a Password" 
-              [(ngModel)]="password"
-              name="password"
-            />
-            <img *ngIf="!showPassword" src="../../assets/img/icons/visibility.png" alt="" (click)="togglePasswordVisibility()" >
-            <img *ngIf="showPassword" src="../../assets/img/icons/visibility_off.png" alt="" (click)="togglePasswordVisibility()" />  
-          </div>
+        <div class="password-container">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Enter a Password"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+          <img
+            *ngIf="!showPassword"
+            src="../../assets/img/icons/visibility.png"
+            alt=""
+            (click)="togglePasswordVisibility()"
+          />
+          <img
+            *ngIf="showPassword"
+            src="../../assets/img/icons/visibility_off.png"
+            alt=""
+            (click)="togglePasswordVisibility()"
+          />
+        </div>
 
-          <div class="password-container">
-            <input 
-              [type]="showPassword ? 'text' : 'password'" 
-              placeholder="Confirm Password" 
-              [(ngModel)]="password_confirmed"
-              name="password_confirmed"
-            />
-            <img *ngIf="!showPassword" src="../../assets/img/icons/visibility.png" alt="" (click)="togglePasswordVisibility()" >
-            <img *ngIf="showPassword" src="../../assets/img/icons/visibility_off.png" alt="" (click)="togglePasswordVisibility()" />  
-          </div>
-   
-          
-        </form>
+        <div class="password-container">
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Confirm Password"
+            [(ngModel)]="password_confirmed"
+            name="password_confirmed"
+            required
+          />
+          <img
+            *ngIf="!showPassword"
+            src="../../assets/img/icons/visibility.png"
+            alt=""
+            (click)="togglePasswordVisibility()"
+          />
+          <img
+            *ngIf="showPassword"
+            src="../../assets/img/icons/visibility_off.png"
+            alt=""
+            (click)="togglePasswordVisibility()"
+          />
+        </div>
         <div class="card-bottom">
-          <button>Get Started</button>
-    
-      </div>
-      </div>
-      <app-footer></app-footer>
+          <button type="submit">Get Started</button>
+        </div>
+      </form>
     </div>
-  </main>
+    <app-footer></app-footer>
+  </div>
+</main>

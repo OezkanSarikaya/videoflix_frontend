@@ -7,11 +7,13 @@ import { VideoOfferComponent } from './video-offer/video-offer.component';
 import { VideoplayerComponent } from './videoplayer/videoplayer.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { AuthGuard } from '../app/services/auth.guard';
+import { ActivateComponent } from './activate/activate.component';
 
 
 export const routes: Routes = [
     {path: "", component: StartsiteComponent},
     {path: "login", component: LoginComponent},
+    {path: "activate", component: ActivateComponent},
     {path: "signup", component: SignupComponent},
     {path: "forgot-password", component: ForgotPasswordComponent},
     {path: "reset-password", component: ResetPasswordComponent},
