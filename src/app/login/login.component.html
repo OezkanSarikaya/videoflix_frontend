@@ -3,26 +3,46 @@
     <app-header></app-header>
     <div class="card">
       <h2>Log in</h2>
-      <form action="">
-        <input type="email" name="" id="" placeholder="Email Address"/>
+      <!-- <form (ngSubmit)="login(loginForm)" #loginForm="ngForm"> -->
+      <form (ngSubmit)="login()" #loginForm="ngForm">
+        <input
+          type="email"
+          placeholder="Email Address"
+          [(ngModel)]="email"
+          name="email"
+          pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+          required
+
+        />
         <div class="password-container">
-          <input 
-            [type]="showPassword ? 'text' : 'password'" 
-            placeholder="Enter a Password" 
+          <input
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Enter a Password"
             [(ngModel)]="password"
             name="password"
           />
-          <img *ngIf="!showPassword" src="../../assets/img/icons/visibility.png" alt="" (click)="togglePasswordVisibility()" >
-          <img *ngIf="showPassword" src="../../assets/img/icons/visibility_off.png" alt="" (click)="togglePasswordVisibility()" />  
+          <img
+            *ngIf="!showPassword"
+            src="../../assets/img/icons/visibility.png"
+            alt=""
+            (click)="togglePasswordVisibility()"
+          />
+          <img
+            *ngIf="showPassword"
+            src="../../assets/img/icons/visibility_off.png"
+            alt=""
+            (click)="togglePasswordVisibility()"
+          />
         </div>
         <label><input type="checkbox" name="" id="" /> Remember me</label>
-        
+        <div class="horizontal-center">
+          <button type="submit">Log in</button>
+        </div>
       </form>
       <div class="card-bottom">
-        <button>Log in</button>
-      <a routerLink="/forgot-password">Forgot password?</a>
-      <div> New to Videoflix?   <a routerLink="/signup">Sign Up now</a></div>
-    </div>
+        <a routerLink="/forgot-password">Forgot password?</a>
+        <div>New to Videoflix? <a routerLink="/signup">Sign Up now</a></div>
+      </div>
     </div>
     <app-footer></app-footer>
   </div>

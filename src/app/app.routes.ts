@@ -6,6 +6,7 @@ import { ForgotPasswordComponent } from './forgot-password/forgot-password.compo
 import { VideoOfferComponent } from './video-offer/video-offer.component';
 import { VideoplayerComponent } from './videoplayer/videoplayer.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
+import { AuthGuard } from '../app/services/auth.guard';
 
 
 export const routes: Routes = [
@@ -14,7 +15,7 @@ export const routes: Routes = [
     {path: "signup", component: SignupComponent},
     {path: "forgot-password", component: ForgotPasswordComponent},
     {path: "reset-password", component: ResetPasswordComponent},
-    {path: "video-offer", component: VideoOfferComponent},
-    {path: "videoplayer", component: VideoplayerComponent},
+    {path: "videos", component: VideoOfferComponent, canActivate: [AuthGuard]},
+    {path: "videoplayer/:id", component: VideoplayerComponent, canActivate: [AuthGuard]},
 
 ];

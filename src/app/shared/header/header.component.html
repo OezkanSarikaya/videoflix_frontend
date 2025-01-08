@@ -1,4 +1,7 @@
 <header>
   <img routerLink="/" src="../../assets/img/Logo.svg" alt="" />
-  <button routerLink="/login">Log in</button>
+
+  <button *ngIf="authService.isAuthenticated()" (click)="onLogout()">Log out</button>
+
+  <button *ngIf="!authService.isAuthenticated()" routerLink="/login">Log in</button>
 </header>
