@@ -38,13 +38,23 @@ export class AuthService {
   }
 
   // Password Reset anfordern
-  requestPasswordReset(email: string): Observable<any> {
+  forgotPassword(email: string): Observable<any> {
     return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, { email });
   }
 
-  // Passwort zurücksetzen
+ 
+  // Methode zur Validierung des Reset-Tokens
+  validateResetToken(uid: string, token: string): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`);
+  }
+
+  // Methode zum Zurücksetzen des Passworts
   resetPassword(uid: string, token: string, newPassword: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}/`, { new_password: newPassword });
+    const payload = {
+      new_password1: newPassword,
+      new_password2: newPassword
+    };
+    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}/`, payload);
   }
 
   // Setze das JWT

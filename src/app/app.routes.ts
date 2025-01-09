@@ -16,8 +16,9 @@ export const routes: Routes = [
     {path: "activate", component: ActivateComponent},
     {path: "signup", component: SignupComponent},
     {path: "forgot-password", component: ForgotPasswordComponent},
-    {path: "reset-password", component: ResetPasswordComponent},
+    {path: "reset-password/:uid/:token", component: ResetPasswordComponent},
     {path: "videos", component: VideoOfferComponent, canActivate: [AuthGuard]},
-    {path: "videoplayer/:id", component: VideoplayerComponent, canActivate: [AuthGuard]},
+    // {path: "videoplayer/:id", component: VideoplayerComponent, canActivate: [AuthGuard]},
+    {path: "videoplayer", component: VideoplayerComponent, canActivate: [AuthGuard]},
 
 ];

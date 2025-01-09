@@ -5,10 +5,10 @@
       <h2>Sign up</h2>
       <!-- Erfolgs-/Fehlermeldung anzeigen -->
       <div *ngIf="showSuccessMessage" class="success-message">
-        <p>
+     
           An email has been sent to you. Please check your inbox to confirm your
           registration.
-        </p>
+    
       </div>
       <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
       <form *ngIf="!showSuccessMessage" (ngSubmit)="signup()">

@@ -2,9 +2,22 @@
   <div class="max-width vertical-center">
     <app-header></app-header>
     <div class="card">
-      <h2>activate</h2>
-      <p>{{ this.activationStatus }}</p>
-      <p>{{ this.message }}</p>
+      <h2>Activate your account</h2>
+
+      <div *ngIf="this.activationStatus == 'success'" class="success-message">
+        <p>{{ this.message }}</p>
+        <div class="horizontal-center">
+          <button routerLink="/login">Log in</button>
+        </div>
+      </div>
+
+      <div *ngIf="this.activationStatus == 'error'">
+        <div>{{ this.message }}</div>
+      </div>
+
+      <div *ngIf="this.activationStatus == 'loading'">
+        <div>{{ this.message }}</div>
+      </div>
     </div>
 
     <app-footer></app-footer>
