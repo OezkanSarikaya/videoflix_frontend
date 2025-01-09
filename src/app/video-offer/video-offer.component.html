@@ -24,79 +24,18 @@
       </div>
 
       <div class="video-content">
-        <div class="video-category">
-          <h3>New on Videoflix</h3>
+        <div class="video-category" *ngFor="let video of videos">
+          <h3>{{ video.title }}</h3>
           <div class="video-thumbnails">
-            <img
-              src="../../assets/img/thumbnails/rhythms-of-friendship.png"
-              alt=""
-            />
-            <img src="../../assets/img/thumbnails/majestic-whales.png" alt="" />
-            <img
-              src="../../assets/img/thumbnails/whispering-shadows.png"
-              alt=""
-            />
-            <img
-              src="../../assets/img/thumbnails/babys-secret-language.png"
-              alt=""
-            />
-            <img
-              src="../../assets/img/thumbnails/world-of-wonders.png"
-              alt=""
-            />
-            <img
-              src="../../assets/img/thumbnails/48-hours-to-survive.png"
-              alt=""
-            />
+            <div *ngFor="let movie of video.videos">
+              <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" />
+            </div>
           </div>
         </div>
+      </div>
 
-        <div class="video-category">
-          <h3>Documentary</h3>
-          <div class="video-thumbnails">
-            <img src="../../assets/img/thumbnails/majestic-whales.png" alt="" />
-            <img
-              src="../../assets/img/thumbnails/world-of-wonders.png"
-              alt=""
-            />
-            <img
-              src="../../assets/img/thumbnails/babys-secret-language.png"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <div class="video-category">
-          <h3>Drama</h3>
-          <div class="video-thumbnails">
-            <img
-              src="../../assets/img/thumbnails/rhythms-of-friendship.png"
-              alt=""
-            />
-            <img
-              src="../../assets/img/thumbnails/48-hours-to-survive.png"
-              alt=""
-            />
-            <img
-              src="../../assets/img/thumbnails/chronicle-of-a-crime.png"
-              alt=""
-            />
-            <img src="../../assets/img/thumbnails/breakout.png" alt="" />
-
-            <img
-              src="../../assets/img/thumbnails/whispering-shadows.png"
-              alt=""
-            />
-          </div>
-        </div>
-
-        <div class="video-category">
-          <h3>Romance</h3>
-          <div class="video-thumbnails">
-            <img src="../../assets/img/thumbnails/when-i-met-you.png" alt="" />
-            <img src="../../assets/img/thumbnails/hate-you.png" alt="" />
-          </div>
-        </div>
+      <div *ngIf="error" class="error-message">
+        {{ error }}
       </div>
       <app-footer></app-footer>
     </div>

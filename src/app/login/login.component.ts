@@ -34,7 +34,7 @@ export class LoginComponent {
     this.authService.login(this.email, this.password).subscribe({
       next: (response) => {
         // Token speichern
-        this.authService.setAccessToken(response.access);
+        // this.authService.setAccessToken(response.access);
         // Weiterleitung zur Video-Übersicht oder zum gewünschten Endpoint
         this.router.navigate(['/videos']);
       },

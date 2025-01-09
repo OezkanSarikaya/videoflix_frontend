@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '../environment/environment';
 import { Router } from '@angular/router';
+
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,21 @@ export class AuthService {
     return typeof window !== 'undefined';
   }
 
+  isLoggedIn(): boolean {
+    const accessToken = localStorage.getItem('accessToken');
+    // Prüfe, ob der Access Token im LocalStorage existiert und ob er noch gültig ist.
+    if (accessToken) {
+      const tokenExpiry = this.getTokenExpiry(accessToken);
+      return tokenExpiry > Date.now();
+    }
+    return false;
+  }
+  
+  private getTokenExpiry(token: string): number {
+    const tokenPayload = JSON.parse(atob(token.split('.')[1])); // Extrahiere den Payload des Tokens
+    return tokenPayload.exp * 1000;  // Konvertiere den Expiry-Timestamp von Sekunden zu Millisekunden
+  }
+
   activateAccount(uid: string, token: string): Observable<any> {
     const url = `${this.apiUrl}/api/users/activate/${uid}/${token}/`; // URL zusammenstellen
     console.log('Sending GET request to:', url);
@@ -26,9 +42,17 @@ export class AuthService {
   }
 
   // Login-Methode
+  // login(email: string, password: string): Observable<any> {
+  //   const body = { email, password };
+  //   return this.http.post<any>(`${this.apiUrl}/api/users/login/`, body);
+  // }
+
   login(email: string, password: string): Observable<any> {
-    const body = { email, password };
-    return this.http.post<any>(`${this.apiUrl}/api/users/login/`, body);
+    return this.http.post(`${this.apiUrl}/api/users/login/`, { email, password }).pipe(
+      tap((tokens: any) => {
+        this.storeTokens(tokens);
+      })
+    );
   }
 
   // Signup-Methode
@@ -58,14 +82,14 @@ export class AuthService {
   }
 
   // Setze das JWT
-  setAccessToken(token: string) {
-    this.accessToken = token;
-    localStorage.setItem('access_token', token); // Optional: Du kannst das Token auch im localStorage speichern
-  }
+  // setAccessToken(token: string) {
+  //   this.accessToken = token;
+  //   localStorage.setItem('access_token', token); // Optional: Du kannst das Token auch im localStorage speichern
+  // }
 
   // Hol das JWT
   getAccessToken(): string | null {
-    return this.accessToken || localStorage.getItem('access_token');
+    return this.accessToken || localStorage.getItem('accessToken');
   }
 
   // Setze den Authorization Header
@@ -80,10 +104,38 @@ export class AuthService {
   }
 
   // Logout des Benutzers
-  logout() {
-    this.accessToken = null;
-    localStorage.removeItem('access_token');
-    this.router.navigate(['/login']);
+  // logout() {
+  //   this.accessToken = null;
+  //   localStorage.removeItem('access_token');
+  //   this.router.navigate(['/login']);
+  // }
+
+  logout(): void {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    // Weiterleitung zur Login-Seite
+    window.location.href = '/login';
+  }
+
+  refreshToken(): Observable<any> {
+    const refreshToken = localStorage.getItem('refreshToken');
+    console.log('Refreshing token with refresh token', refreshToken); 
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token found'));
+    }
+
+    return this.http.post(`${this.apiUrl}/api/users/token/refresh/`, { refresh: refreshToken }).pipe(
+      tap((tokens: any) => {
+        // Speichere die neuen Tokens im Local Storage
+        console.log('New tokens received:', tokens); 
+        this.storeTokens(tokens);
+      })
+    );
+  }
+
+  storeTokens(tokens: { access: string; refresh: string }): void {
+    localStorage.setItem('accessToken', tokens.access);
+    localStorage.setItem('refreshToken', tokens.refresh);
   }
 }
 
