@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '../environment/environment';
 import { Router } from '@angular/router';
@@ -8,48 +8,64 @@ import { Router } from '@angular/router';
   providedIn: 'root',
 })
 export class AuthService {
-  private apiUrl = environment.apiUrl; // Hier definierst du die Basis-URL deines Backends
+  private apiUrl = environment.apiUrl; // URL zu deinem Backend
   private accessToken: string | null = null;
+  private refreshTokenTimeout: any;
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  // Methode zum sicheren Zugriff auf localStorage
-  private get isBrowser(): boolean {
-    return typeof window !== 'undefined';
-  }
-
+  // Überprüft, ob der Benutzer eingeloggt ist
   isLoggedIn(): boolean {
-    const accessToken = localStorage.getItem('accessToken');
-
-    if (!accessToken) {
-      return false;
-    }
+    const accessToken = this.getAccessToken();
+    if (!accessToken) return false;
 
     const payload = JSON.parse(atob(accessToken.split('.')[1]));
     const expiry = payload.exp * 1000;
-
     return Date.now() < expiry;
   }
 
-  private getTokenExpiry(token: string): number {
-    const tokenPayload = JSON.parse(atob(token.split('.')[1])); // Extrahiere den Payload des Tokens
-    return tokenPayload.exp * 1000; // Konvertiere den Expiry-Timestamp von Sekunden zu Millisekunden
-  }
-
+  // Account-Aktivierung
   activateAccount(uid: string, token: string): Observable<any> {
-    const url = `${this.apiUrl}/api/users/activate/${uid}/${token}/`; // URL zusammenstellen
-
-    return this.http.get(url); // GET-Request ohne Payload
+    const url = `${this.apiUrl}/api/users/activate/${uid}/${token}/`;
+    return this.http.get(url);
   }
 
-  login(email: string, password: string): Observable<any> {
-    return this.http
-      .post(`${this.apiUrl}/api/users/login/`, { email, password })
-      .pipe(
-        tap((tokens: any) => {
-          this.storeTokens(tokens);
-        })
-      );
+  // Startet den Timer für das automatische Token-Refresh
+  private startRefreshTokenTimer(): void {
+    this.stopRefreshTokenTimer(); // Vorherige Timer stoppen
+
+    const accessToken = this.getAccessToken();
+    if (!accessToken) return;
+
+    const tokenPayload = JSON.parse(atob(accessToken.split('.')[1]));
+    const expiresAt = tokenPayload.exp * 1000;
+    const timeout = expiresAt - Date.now() - 60000; // 1 Minute vor Ablauf
+
+    if (timeout > 0) {
+      console.log(`🕒 Timer wird in ${timeout / 1000} Sekunden ausgelöst`);
+      this.refreshTokenTimeout = setTimeout(() => {
+        this.refreshToken().subscribe();
+      }, timeout);
+    } else {
+      console.warn('❌ Timeout zu kurz, kein Timer gestartet');
+    }
+  }
+
+  // Stoppt den Timer für das automatische Token-Refresh
+  private stopRefreshTokenTimer(): void {
+    if (this.refreshTokenTimeout) {
+      clearTimeout(this.refreshTokenTimeout);
+    }
+  }
+
+  // Login-Methode
+  login(email: string, password: string, rememberme: boolean): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/api/users/login/`, { email, password }).pipe(
+      tap((tokens) => {
+        this.storeTokens(tokens, rememberme);
+        this.startRefreshTokenTimer();
+      })
+    );
   }
 
   // Signup-Methode
@@ -58,26 +74,18 @@ export class AuthService {
     return this.http.post<any>(`${this.apiUrl}/api/users/signup/`, body);
   }
 
-  // Password Reset anfordern
+  // Passwort zurücksetzen anfordern
   forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, {
-      email,
-    });
+    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, { email });
   }
 
-  // Methode zur Validierung des Reset-Tokens
+  // Reset-Token validieren
   validateResetToken(uid: string, token: string): Observable<any> {
-    return this.http.get<any>(
-      `${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`
-    );
+    return this.http.get<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`);
   }
 
-  // Methode zum Zurücksetzen des Passworts
-  resetPassword(
-    uid: string,
-    token: string,
-    newPassword: string
-  ): Observable<any> {
+  // Passwort zurücksetzen
+  resetPassword(uid: string, token: string, newPassword: string): Observable<any> {
     const payload = {
       new_password1: newPassword,
       new_password2: newPassword,
@@ -88,24 +96,29 @@ export class AuthService {
     );
   }
 
-  // Hol das JWT
+  // Hol den Access Token
   getAccessToken(): string | null {
-    return this.accessToken || localStorage.getItem('accessToken');
+    return (
+      this.accessToken ||
+      localStorage.getItem('accessToken') ||
+      sessionStorage.getItem('accessToken')
+    );
   }
 
   // Setze den Authorization Header
-  getAuthHeaders() {
+  getAuthHeaders(): HttpHeaders {
     const token = this.getAccessToken();
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
-  // Überprüfe, ob der Benutzer eingeloggt ist
+  // Überprüft, ob der Benutzer authentifiziert ist
   isAuthenticated(): boolean {
     return !!this.getAccessToken();
   }
 
+  // Überprüft, ob der Access Token abgelaufen ist
   isAccessTokenExpired(): boolean {
-    const accessToken = localStorage.getItem('accessToken');
+    const accessToken = this.getAccessToken();
     if (!accessToken) return true;
 
     const payload = JSON.parse(atob(accessToken.split('.')[1]));
@@ -113,43 +126,52 @@ export class AuthService {
     return Date.now() > expiry;
   }
 
+  // Überprüft, ob ein Refresh Token vorhanden ist
   isRefreshTokenAvailable(): boolean {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = this.getRefreshToken();
     return !!refreshToken;
   }
 
+  // Logout-Methode
   logout(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    // Weiterleitung zur Login-Seite
-    window.location.href = '/login';
+    localStorage.clear();
+    sessionStorage.clear();
+    this.stopRefreshTokenTimer();
+    this.router.navigate(['/login']);
   }
 
+  // Refresh Token Methode
   refreshToken(): Observable<any> {
-    const refreshToken = localStorage.getItem('refreshToken');
+    const refreshToken = this.getRefreshToken();
 
     if (!refreshToken) {
       return throwError(() => new Error('No refresh token found'));
     }
 
-    return this.http
-      .post(`${this.apiUrl}/api/users/token/refresh/`, {
-        refresh: refreshToken,
+    return this.http.post<any>(`${this.apiUrl}/api/users/token/refresh/`, { refresh: refreshToken }).pipe(
+      tap((tokens) => {
+        const rememberme = !!localStorage.getItem('accessToken');
+        this.storeTokens(tokens, rememberme);
+        this.startRefreshTokenTimer();
       })
-      .pipe(
-        tap((tokens: any) => {
-          // Speichere die neuen Tokens im Local Storage
-          this.storeTokens(tokens);
-        })
-      );
+    );
   }
 
-  storeTokens(tokens: { access: string; refresh: string }): void {
-    if (tokens.access) {
-      localStorage.setItem('accessToken', tokens.access);
-    }
+  // Hol den Refresh Token
+  private getRefreshToken(): string | null {
+    return localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+  }
+
+  // Speichere Tokens im Storage
+  private storeTokens(tokens: any, rememberme: boolean): void {
+    const storage = rememberme ? localStorage : sessionStorage;
+
+    // Speichere den Access Token
+    storage.setItem('accessToken', tokens.access);
+
+    // Speichere den Refresh Token nur, wenn er vorhanden ist
     if (tokens.refresh) {
-      localStorage.setItem('refreshToken', tokens.refresh);
+      storage.setItem('refreshToken', tokens.refresh);
     }
   }
 }

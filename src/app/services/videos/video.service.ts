@@ -13,7 +13,8 @@ export class VideoService {
   constructor(private http: HttpClient, private authService: AuthService) {}
 
   getVideos(): Observable<any> {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
     
     if (!token) {
       throw new Error('No access token found');
