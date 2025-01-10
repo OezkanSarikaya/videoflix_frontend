@@ -25,7 +25,10 @@
           <h3>{{ video.title }}</h3>
           <div class="video-thumbnails">
             <div *ngFor="let movie of video.videos">
-              <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" (click)="onVideoClick(movie.id)"/>
+              <!-- <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" (click)="onVideoClick(movie.id)"/> -->
+              <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" (click)="openVideoPlayer(movie.id)" />
+
+              
             </div>
           </div>
         </div>

@@ -8,9 +8,21 @@ import { AuthService } from '../auth.service';  // Dein AuthService für Token-V
   providedIn: 'root',
 })
 export class VideoService {
-  private apiUrl = 'http://127.0.0.1:8000/api/genres/videos/';  // Deine API-URL
+  private apiUrl = 'http://127.0.0.1:8000/';  // Deine API-URL
 
   constructor(private http: HttpClient, private authService: AuthService) {}
+
+  getVideoById(id: string): Observable<any> {
+    const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    
+    if (!token) {
+      throw new Error('No access token found');
+    }
+
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<any>(`${this.apiUrl}api/videos/${id}`, { headers });
+  }
 
   getVideos(): Observable<any> {
     const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -22,7 +34,7 @@ export class VideoService {
 
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
 
-    return this.http.get(this.apiUrl, { headers });
+    return this.http.get(this.apiUrl + 'api/genres/videos/', { headers });
   }
 }
 

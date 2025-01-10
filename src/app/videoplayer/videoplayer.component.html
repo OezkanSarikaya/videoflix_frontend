@@ -1,12 +1,13 @@
-<div class="container">
+<div class="container" *ngIf="videoData">
+
   <video
+  
     #videoPlayer
     (timeupdate)="updateSeekbar()"
-    (loadedmetadata)="onMetadataLoaded()"
+    (loadedmetadata)="onMetadataLoaded()"   
   >
-    <source src="../../assets/video-trailer/escape.mp4" type="video/mp4" />
+    <source src="http://127.0.0.1:8000{{ videoData.video_file }}" type="video/mp4" />
     <!-- <source src="../../assets/video-trailer/224155.mp4" type="video/mp4" /> -->
-  
     
   </video>
 
@@ -40,7 +41,7 @@
           <img src="../../assets/img/icons/forward_10.png" alt="" (click)="forward(10)" />
           <img src="../../assets/img/icons/volume_up.png" alt="" />
         </div>
-        <div class="middleTitle">Majestic Whales</div>
+        <div class="middleTitle">{{videoData.title}}</div>
         <div class="rightIcons">
           <img src="../../assets/img/icons/subtitles.png" alt="" />
           <img src="../../assets/img/icons/speed.png" alt="" />

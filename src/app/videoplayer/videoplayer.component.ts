@@ -1,15 +1,24 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  AfterViewInit,
+  OnInit,
+} from '@angular/core';
+import { RouterLink, RouterOutlet, ActivatedRoute } from '@angular/router';
+import { VideoService } from '../../app/services/videos/video.service';
 
 @Component({
   selector: 'app-videoplayer',
   standalone: true,
   imports: [CommonModule, RouterOutlet, RouterLink],
   templateUrl: './videoplayer.component.html',
-  styleUrl: './videoplayer.component.scss'
+  styleUrls: ['./videoplayer.component.scss'],
 })
-export class VideoplayerComponent implements AfterViewInit {
+export class VideoplayerComponent implements AfterViewInit, OnInit {
+  videoId: string | null = null;
+  videoData: any = null; // Hier werden die Video-Daten gespeichert
 
   @ViewChild('videoPlayer') videoPlayer!: ElementRef<HTMLVideoElement>;
   @ViewChild('seekbar') seekbar!: ElementRef<HTMLInputElement>;
@@ -17,17 +26,50 @@ export class VideoplayerComponent implements AfterViewInit {
   seekbarValue: number = 0;
   videoDuration: string = '00:00';
 
-    // Wird aufgerufen, wenn die Komponente geladen ist
-    ngAfterViewInit(): void {
+  constructor(
+    private route: ActivatedRoute,
+    private videoService: VideoService // Dein Service, um Video-Daten zu laden
+  ) {}
+
+  // Wird aufgerufen, wenn die Komponente geladen ist
+  ngOnInit(): void {
+    // Extrahiere die Video-ID aus der Route
+    this.route.paramMap.subscribe((params) => {
+      this.videoId = params.get('videoId');
+      if (this.videoId) {
+        this.loadVideoData(this.videoId); // Lade Video-Daten, wenn die ID vorhanden ist
+      }
+    });
+  }
+
+  // Wird aufgerufen, wenn die View (DOM) der Komponente vollständig geladen ist
+  ngAfterViewInit(): void {
+    if (this.videoPlayer) {
       const video = this.videoPlayer.nativeElement;
-  
+
       // Event-Listener hinzufügen, um die Gesamtlänge des Videos anzuzeigen
       video.addEventListener('loadedmetadata', () => {
         this.videoDuration = this.formatTime(video.duration);
       });
-    }
 
-  // @ViewChild('videoPlayer') videoPlayer?: ElementRef;
+      // Optionale Event-Listener für andere Funktionen
+      video.addEventListener('timeupdate', () => {
+        this.updateSeekbar(); // Seekbar aktualisieren, wenn die Zeit des Videos läuft
+      });
+    }
+  }
+
+  loadVideoData(id: string): void {
+    this.videoService.getVideoById(id).subscribe(
+      (data) => {
+        this.videoData = data;
+        // console.log('Video Data loaded:', this.videoData);
+      },
+      (error) => {
+        console.error('Error loading video data:', error);
+      }
+    );
+  }
 
   toggleVideo() {
     const video: HTMLVideoElement = this.videoPlayer?.nativeElement;
@@ -60,7 +102,7 @@ export class VideoplayerComponent implements AfterViewInit {
     const hours = Math.floor(time / 3600);
     const minutes = Math.floor((time % 3600) / 60);
     const seconds = Math.floor(time % 60);
-  
+
     if (hours > 0) {
       return `${hours}:${this.padZero(minutes)}:${this.padZero(seconds)}`;
     } else {
@@ -77,7 +119,7 @@ export class VideoplayerComponent implements AfterViewInit {
     const video = this.videoPlayer.nativeElement;
     video.currentTime = Math.max(video.currentTime - seconds, 0);
   }
-  
+
   forward(seconds: number): void {
     const video = this.videoPlayer.nativeElement;
     video.currentTime = Math.min(video.currentTime + seconds, video.duration);
@@ -85,12 +127,11 @@ export class VideoplayerComponent implements AfterViewInit {
 
   toggleFullscreen(): void {
     const video = this.videoPlayer.nativeElement;
-  
+
     if (!document.fullscreenElement) {
       video.requestFullscreen();
     } else {
       document.exitFullscreen();
     }
   }
-
 }

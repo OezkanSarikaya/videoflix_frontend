@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HeaderComponent } from "../shared/header/header.component";
 import { FooterComponent } from "../shared/footer/footer.component";
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { VideoService } from '../../app/services/videos/video.service';  // Der Service für das Abrufen der Videos
 import { AuthService } from '../../app/services/auth.service';  // Dein AuthService
 import { CommonModule } from '@angular/common';
@@ -24,7 +24,14 @@ export class VideoOfferComponent implements OnInit {
   
 
 
-  constructor(private videoService: VideoService, private authService: AuthService, private http: HttpClient) {}
+  constructor(private videoService: VideoService, private authService: AuthService, private http: HttpClient, private router: Router) {}
+
+  openVideoPlayer(videoId: string): void {
+    // Navigiere zur Video-Player-Seite und übergebe die Video-ID
+    // console.log(videoId);
+    
+    this.router.navigate(['/videoplayer/', videoId]);
+  }
 
   ngOnInit(): void {
     this.loadVideos();
