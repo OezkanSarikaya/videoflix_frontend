@@ -1,7 +1,7 @@
 <div class="black">
   <div class="wrapper">
     <video width="100%" height="100%" id="trailer" autoplay muted loop>
-      <source src="../../assets/video-trailer/escape.mp4" type="video/mp4" />
+      <source src="http://127.0.0.1:8000{{trailerVideoUrl}}" type="video/mp4" />
     </video>
   </div>
   <main class="video-offer">
@@ -10,12 +10,9 @@
 
       <div class="video-preview">
         <div class="video-info-preview">
-          <h1>Breakout</h1>
+          <h1>{{trailerTitle}}</h1>
           <p>
-            In a high-security prison, a wrongly convicted man formulates a
-            meticulous plan to break out and prove his innocence. He must
-            navigate a web of alliances and betrayals to reclaim his freedom and
-            expose the truth.
+          {{trailerDescription}}
           </p>
           <div>
             <button routerLink="/videoplayer">Play</button>
@@ -28,7 +25,7 @@
           <h3>{{ video.title }}</h3>
           <div class="video-thumbnails">
             <div *ngFor="let movie of video.videos">
-              <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" />
+              <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" (click)="onVideoClick(movie.id)"/>
             </div>
           </div>
         </div>

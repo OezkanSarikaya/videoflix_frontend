@@ -1,5 +1,10 @@
 import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router } from '@angular/router';
+import {
+  CanActivate,
+  ActivatedRouteSnapshot,
+  RouterStateSnapshot,
+  Router,
+} from '@angular/router';
 import { Observable } from 'rxjs';
 import { AuthService } from './auth.service';
 
@@ -15,8 +20,18 @@ export class AuthGuard implements CanActivate {
   ): Observable<boolean> | Promise<boolean> | boolean {
     if (this.authService.isLoggedIn()) {
       return true;
+    } else if (this.authService.isRefreshTokenAvailable()) {
+      return this.authService
+        .refreshToken()
+        .toPromise()
+        .then(() => {
+          return true;
+        })
+        .catch((err) => {
+          this.router.navigate(['/login']);
+          return false;
+        });
     } else {
-      // Falls der Benutzer nicht authentifiziert ist, leite ihn zur Login-Seite weiter
       this.router.navigate(['/login']);
       return false;
     }

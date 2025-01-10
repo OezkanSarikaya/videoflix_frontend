@@ -4,16 +4,14 @@ import { Observable, tap, throwError } from 'rxjs';
 import { environment } from '../environment/environment';
 import { Router } from '@angular/router';
 
-
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthService {
-
   private apiUrl = environment.apiUrl; // Hier definierst du die Basis-URL deines Backends
   private accessToken: string | null = null;
 
-  constructor(private http: HttpClient, private router: Router) { }
+  constructor(private http: HttpClient, private router: Router) {}
 
   // Methode zum sicheren Zugriff auf localStorage
   private get isBrowser(): boolean {
@@ -22,37 +20,36 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     const accessToken = localStorage.getItem('accessToken');
-    // Prüfe, ob der Access Token im LocalStorage existiert und ob er noch gültig ist.
-    if (accessToken) {
-      const tokenExpiry = this.getTokenExpiry(accessToken);
-      return tokenExpiry > Date.now();
+
+    if (!accessToken) {
+      return false;
     }
-    return false;
+
+    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+    const expiry = payload.exp * 1000;
+
+    return Date.now() < expiry;
   }
-  
+
   private getTokenExpiry(token: string): number {
     const tokenPayload = JSON.parse(atob(token.split('.')[1])); // Extrahiere den Payload des Tokens
-    return tokenPayload.exp * 1000;  // Konvertiere den Expiry-Timestamp von Sekunden zu Millisekunden
+    return tokenPayload.exp * 1000; // Konvertiere den Expiry-Timestamp von Sekunden zu Millisekunden
   }
 
   activateAccount(uid: string, token: string): Observable<any> {
     const url = `${this.apiUrl}/api/users/activate/${uid}/${token}/`; // URL zusammenstellen
-    console.log('Sending GET request to:', url);
+
     return this.http.get(url); // GET-Request ohne Payload
   }
 
-  // Login-Methode
-  // login(email: string, password: string): Observable<any> {
-  //   const body = { email, password };
-  //   return this.http.post<any>(`${this.apiUrl}/api/users/login/`, body);
-  // }
-
   login(email: string, password: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/api/users/login/`, { email, password }).pipe(
-      tap((tokens: any) => {
-        this.storeTokens(tokens);
-      })
-    );
+    return this.http
+      .post(`${this.apiUrl}/api/users/login/`, { email, password })
+      .pipe(
+        tap((tokens: any) => {
+          this.storeTokens(tokens);
+        })
+      );
   }
 
   // Signup-Methode
@@ -63,29 +60,33 @@ export class AuthService {
 
   // Password Reset anfordern
   forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, { email });
+    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, {
+      email,
+    });
   }
 
- 
   // Methode zur Validierung des Reset-Tokens
   validateResetToken(uid: string, token: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`);
+    return this.http.get<any>(
+      `${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`
+    );
   }
 
   // Methode zum Zurücksetzen des Passworts
-  resetPassword(uid: string, token: string, newPassword: string): Observable<any> {
+  resetPassword(
+    uid: string,
+    token: string,
+    newPassword: string
+  ): Observable<any> {
     const payload = {
       new_password1: newPassword,
-      new_password2: newPassword
+      new_password2: newPassword,
     };
-    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}/`, payload);
+    return this.http.post<any>(
+      `${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}/`,
+      payload
+    );
   }
-
-  // Setze das JWT
-  // setAccessToken(token: string) {
-  //   this.accessToken = token;
-  //   localStorage.setItem('access_token', token); // Optional: Du kannst das Token auch im localStorage speichern
-  // }
 
   // Hol das JWT
   getAccessToken(): string | null {
@@ -103,12 +104,19 @@ export class AuthService {
     return !!this.getAccessToken();
   }
 
-  // Logout des Benutzers
-  // logout() {
-  //   this.accessToken = null;
-  //   localStorage.removeItem('access_token');
-  //   this.router.navigate(['/login']);
-  // }
+  isAccessTokenExpired(): boolean {
+    const accessToken = localStorage.getItem('accessToken');
+    if (!accessToken) return true;
+
+    const payload = JSON.parse(atob(accessToken.split('.')[1]));
+    const expiry = payload.exp * 1000;
+    return Date.now() > expiry;
+  }
+
+  isRefreshTokenAvailable(): boolean {
+    const refreshToken = localStorage.getItem('refreshToken');
+    return !!refreshToken;
+  }
 
   logout(): void {
     localStorage.removeItem('accessToken');
@@ -119,23 +127,29 @@ export class AuthService {
 
   refreshToken(): Observable<any> {
     const refreshToken = localStorage.getItem('refreshToken');
-    console.log('Refreshing token with refresh token', refreshToken); 
+
     if (!refreshToken) {
       return throwError(() => new Error('No refresh token found'));
     }
 
-    return this.http.post(`${this.apiUrl}/api/users/token/refresh/`, { refresh: refreshToken }).pipe(
-      tap((tokens: any) => {
-        // Speichere die neuen Tokens im Local Storage
-        console.log('New tokens received:', tokens); 
-        this.storeTokens(tokens);
+    return this.http
+      .post(`${this.apiUrl}/api/users/token/refresh/`, {
+        refresh: refreshToken,
       })
-    );
+      .pipe(
+        tap((tokens: any) => {
+          // Speichere die neuen Tokens im Local Storage
+          this.storeTokens(tokens);
+        })
+      );
   }
 
   storeTokens(tokens: { access: string; refresh: string }): void {
-    localStorage.setItem('accessToken', tokens.access);
-    localStorage.setItem('refreshToken', tokens.refresh);
+    if (tokens.access) {
+      localStorage.setItem('accessToken', tokens.access);
+    }
+    if (tokens.refresh) {
+      localStorage.setItem('refreshToken', tokens.refresh);
+    }
   }
 }
-
