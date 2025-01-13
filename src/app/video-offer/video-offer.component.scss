@@ -1,5 +1,10 @@
 .black {
   background-color: black;
+  // background: linear-gradient(
+  //   180deg,
+  //   rgba(0, 0, 0, 0.7) 0%,
+  //   rgba(0, 0, 0, 1.0) 100%
+  // );
   position: absolute;
   top: 0;
   left: 0;
@@ -85,6 +90,8 @@ h3 {
     cursor: pointer;
     border: 2px transparent solid;
     transition: border 225ms ease-in-out;
+    width: 213px;
+    height: 120px;
     &:hover {
       border: 2px white solid;
     }
