@@ -1,0 +1,16 @@
+<div class="toast-container" [class.show]="isVisible">
+  <div class="toast-innerbox">
+  </div>
+    <div class="toast-message">
+      <img src="../../../assets/img/icons/ExclamationCircleFill.svg" alt="">
+      <span class="message">{{ message }}</span>
+      <button *ngIf="showActionButton" class="action-btn" (click)="onAction(true)">OK</button>
+      <span class="divider"></span>
+      <button class="close-btn" (click)="closeToast()">&#x2715;</button>
+    </div>
+  </div>
+
+
+
+  
+  

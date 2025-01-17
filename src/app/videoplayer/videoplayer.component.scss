@@ -1,6 +1,26 @@
+
+.wrapper {
+  // background-color: black;
+  height:100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-image: linear-gradient(
+    180deg,
+    #000000 -19.89%,
+    rgba(0, 0, 0, 0.55) 40.46%,
+    #000000 100%
+  ),
+  url("../../assets/img/background/startsite.jpeg");
+background-repeat: no-repeat;
+background-size: cover;
+background-position: center center;
+}
+
 .container {
   position: relative;
-  width: 100%;
+  // width: 100%;
+  width: 1200px;
   background-color: black;
 }
 

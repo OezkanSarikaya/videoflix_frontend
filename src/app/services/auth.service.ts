@@ -143,16 +143,30 @@ export class AuthService {
   // Refresh Token Methode
   refreshToken(): Observable<any> {
     const refreshToken = this.getRefreshToken();
-
+  
     if (!refreshToken) {
+      console.warn('⚠️ Kein Refresh Token gefunden! Benutzer wird ausgeloggt.');
+      this.logout();
       return throwError(() => new Error('No refresh token found'));
     }
-
+  
     return this.http.post<any>(`${this.apiUrl}/api/users/token/refresh/`, { refresh: refreshToken }).pipe(
-      tap((tokens) => {
-        const rememberme = !!localStorage.getItem('accessToken');
-        this.storeTokens(tokens, rememberme);
-        this.startRefreshTokenTimer();
+      tap({
+        next: (tokens) => {
+          console.log('✅ Refresh erfolgreich:', tokens);
+          const rememberme = !!localStorage.getItem('accessToken');
+          this.storeTokens(tokens, rememberme);
+          this.startRefreshTokenTimer();
+        },
+        error: (error) => {
+          console.error('❌ Refresh fehlgeschlagen:', error);
+  
+          // Falls der Server 401 zurückgibt -> Logout
+          if (error.status === 401) {
+            console.warn('⛔ Refresh Token abgelaufen! Benutzer wird ausgeloggt.');
+            this.logout();
+          }
+        }
       })
     );
   }

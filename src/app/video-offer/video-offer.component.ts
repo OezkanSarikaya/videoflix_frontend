@@ -22,6 +22,7 @@ export class VideoOfferComponent implements OnInit {
   trailerDescription: string =
     'In a high-security prison, a wrongly convicted man formulates a meticulous plan to break out and prove his innocence. He must navigate a web of alliances and betrayals to reclaim his freedom and expose the truth.';
   trailerVideoUrl: string = '/media/videos/breakout_720p.mp4';
+  videosWithProgress: any[] = [];
 
   @ViewChild('trailer') trailerVideoElement!: ElementRef<HTMLVideoElement>;
 
@@ -35,12 +36,26 @@ export class VideoOfferComponent implements OnInit {
   openVideoPlayer(videoId: string): void {
     // Navigiere zur Video-Player-Seite und übergebe die Video-ID
     // console.log(videoId);
+    
 
     this.router.navigate(['/videoplayer/', videoId]);
   }
 
   ngOnInit(): void {
     this.loadVideos();
+    this.loadVideosWithProgress();
+  }
+
+  loadVideosWithProgress(): void {
+    this.videoService.getVideosWithProgress().subscribe(
+      (videos) => {
+        this.videosWithProgress = videos;
+        // console.log('Videos with progress loaded:', this.videosWithProgress);
+      },
+      (error) => {
+        console.error('Error loading videos with progress:', error);
+      }
+    );
   }
 
   modifyVideoUrl(originalUrl: string, suffix: string): string {
@@ -81,7 +96,6 @@ export class VideoOfferComponent implements OnInit {
       this.videoService.getVideos().subscribe(
         (data) => {
           this.videos = data; // Speichere die Daten, die du vom Server bekommst
-          console.log(this.videos);
         },
         (err) => {
           this.error = 'Fehler beim Laden der Videos'; // Fehlerbehandlung

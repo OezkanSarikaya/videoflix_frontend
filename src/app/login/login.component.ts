@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
 import { FormsModule, NgForm } from '@angular/forms';
+import { ToastService } from './../services/toast/toast.service';
 
 @Component({
   selector: 'app-login',
@@ -27,16 +28,19 @@ export class LoginComponent {
   email: string = '';
   rememberme: boolean = false;
   errorMessage: string = '';
+  toastResponse: boolean | undefined;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private toastService: ToastService
+  ) {}
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
   }
 
   login() {
-    console.log('Remember me: ' + this.rememberme);
-
     this.authService
       .login(this.email, this.password, this.rememberme)
       .subscribe({
@@ -45,8 +49,10 @@ export class LoginComponent {
           this.router.navigate(['/videos']);
         },
         error: (err) => {
-          this.errorMessage =
-            'Login fehlgeschlagen. Überprüfe deine E-Mail und Passwort.';
+          this.toastService.showToast(
+            'Login fehlgeschlagen. Überprüfe deine E-Mail und das Passwort.',
+            false
+          );
         },
       });
   }

@@ -1,21 +1,22 @@
-<div class="container" *ngIf="videoData">
+<div class="wrapper">
 
+  <div class="container" *ngIf="videoData">
   <video
-  
-    #videoPlayer
-    (timeupdate)="updateSeekbar()"
-    (loadedmetadata)="onMetadataLoaded()"   
-  >
-    <source src="http://127.0.0.1:8000{{ videoData.video_file }}" type="video/mp4" />
-    <!-- <source src="../../assets/video-trailer/224155.mp4" type="video/mp4" /> -->
-    
-  </video>
+      #target
+      id="target"
+      [src]="'http://127.0.0.1:8000' + videoData.video_file"
+      (timeupdate)="updateSeekbar()"
+    ></video>   
 
-  <!-- <div class="overlay" (click)="toggleVideo()"> -->
-    <div class="overlay">
+
+  <div class="overlay">
     <div class="topIcons">
       <div class="topLeftIcons">
-        <img src="../../assets/img/icons/arrow_back.png" alt="" routerLink="/videos" />
+        <img
+          src="../../assets/img/icons/arrow_back.png"
+          alt=""
+          routerLink="/videos"
+        />
       </div>
       <div class="topMiddleText">Optimizing video for your screen 40%</div>
       <div class="topRightIcons">
@@ -23,31 +24,52 @@
       </div>
     </div>
     <div class="bottom-controls">
-      <div class="custom-controls">
-        <input
-          type="range"
-          #seekbar
-          [value]="seekbarValue"
-          (input)="onSeek($event)"
-          step="0.1"
-        />
-        <span class="video-duration">{{ videoDuration }}</span>
-      </div>
-      <div class="bottomIcons">
-        <div class="leftIcons">
-          <img  *ngIf="videoPlayer.paused" src="../../assets/img/icons/play_arrow.png" alt="" (click)="toggleVideo()" />
-          <img *ngIf="!videoPlayer.paused" src="../../assets/img/icons/pause.png" alt="" (click)="toggleVideo()" />
-          <img src="../../assets/img/icons/replay_10.png" alt="" (click)="rewind(10)" />
-          <img src="../../assets/img/icons/forward_10.png" alt="" (click)="forward(10)" />
-          <img src="../../assets/img/icons/volume_up.png" alt="" />
+        <div class="custom-controls">
+          <input
+            type="range"
+            #seekbar
+            [value]="seekbarValue"
+            (input)="onSeek($event)"
+            step="0.1"
+          />
+          <span class="video-duration"
+            >{{ formatTime(currentTime) }} / {{ videoDuration }}</span
+          >
         </div>
-        <div class="middleTitle">{{videoData.title}}</div>
-        <div class="rightIcons">
-          <img src="../../assets/img/icons/subtitles.png" alt="" />
-          <img src="../../assets/img/icons/speed.png" alt="" />
-          <img src="../../assets/img/icons/fullscreen.png" alt="" (click)="toggleFullscreen()"/>
+        <div class="bottomIcons">
+          <div class="leftIcons">
+            <img
+              *ngIf="target.paused"
+              src="../../assets/img/icons/play_arrow.png"
+              alt=""
+              (click)="toggleVideo()"
+            />
+            <img
+              *ngIf="!target.paused"
+              src="../../assets/img/icons/pause.png"
+              alt=""
+              (click)="toggleVideo()"
+            />
+            <img
+              src="../../assets/img/icons/replay_10.png"
+              alt=""
+              (click)="rewind(10)"
+            />
+            <img
+              src="../../assets/img/icons/forward_10.png"
+              alt=""
+              (click)="forward(10)"
+            />
+            <img src="../../assets/img/icons/volume_up.png" alt="" />
+          </div>
+          <div class="middleTitle">{{ videoData.title }}</div>
+          <div class="rightIcons">
+            <img src="../../assets/img/icons/subtitles.png" alt="" />
+            <img src="../../assets/img/icons/speed.png" alt="" />
+            <img src="../../assets/img/icons/fullscreen.png" alt="" />
+          </div>
         </div>
       </div>
-    </div>
+  </div>
   </div>
 </div>
