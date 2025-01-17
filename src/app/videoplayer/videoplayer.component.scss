@@ -69,7 +69,7 @@ input[type="range"]::-webkit-slider-thumb {
   right: 0;
   height: 100%;
   width: 100%;
-  opacity: 0;
+  opacity: 1;
   transition: 0.5s ease;
   display: flex;
   flex-direction: column;
@@ -149,3 +149,61 @@ input[type="range"]::-webkit-slider-thumb {
   line-height: 15.62px;
   text-align: center;
 }
+
+.resolution-popup {
+  position: absolute;
+  bottom: 100px;
+  right: 30px;
+  width:200px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border-radius: 8px;
+  padding: 10px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(10px);
+  transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: background 0.2s;
+      border-radius: 4px;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+}
+
+/* Zeige das Popup an, wenn isResolutionPopupOpen = true */
+.resolution-popup.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+/* Markiert die aktuell gewählte Auflösung */
+.resolution-popup ul li.selected {
+  background: rgba(255, 255, 255, 0.4);
+  font-weight: bold;
+}
+
+/* Stil für das Icon */
+.resolution-btn {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 24px;
+  cursor: pointer;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+

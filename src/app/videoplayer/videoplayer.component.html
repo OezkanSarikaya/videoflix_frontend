@@ -60,16 +60,35 @@
               alt=""
               (click)="forward(10)"
             />
-            <img src="../../assets/img/icons/volume_up.png" alt="" />
+            <img src="../../assets/img/icons/volume_up.png" *ngIf="!isMuted" alt="" (click)="toggleMute()" />
+            <img src="../../assets/img/icons/volume_off.png" *ngIf="isMuted" alt="" (click)="toggleMute()" />
           </div>
           <div class="middleTitle">{{ videoData.title }}</div>
           <div class="rightIcons">
             <img src="../../assets/img/icons/subtitles.png" alt="" />
-            <img src="../../assets/img/icons/speed.png" alt="" />
-            <img src="../../assets/img/icons/fullscreen.png" alt="" />
+            <img src="../../assets/img/icons/speed.png" alt="" (click)="toggleResolutionPopup()" />
+            <img src="../../assets/img/icons/fullscreen.png" alt="" (click)="toggleFullscreen()" />
           </div>
         </div>
+
+
+
+        <div class="resolution-popup" [class.show]="isResolutionPopupOpen">
+          <ul>
+            <li 
+              *ngFor="let res of ['120p', '360p', '720p', '1080p']" 
+              (click)="setResolution(res)"
+              [class.selected]="selectedResolution === res">
+              {{ res }}
+            </li>
+          </ul>
+        </div>
+
+
+
       </div>
   </div>
   </div>
 </div>
+
+

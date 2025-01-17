@@ -25,6 +25,9 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   videoId: string | null = null;
   videoData: any = null;
   toastResponse: boolean = false;
+  isMuted: boolean = false;
+  isResolutionPopupOpen: boolean = false;
+  selectedResolution: string = '720p';
 
   // @ViewChild('target', { static: false })
   @ViewChild('target', { static: false }) target!: ElementRef<HTMLVideoElement>;
@@ -88,6 +91,12 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   loadVideoData(id: string): void {
     this.videoService.getVideoById(id).subscribe(
       (data) => {
+        // Standardmäßig 720p hinzufügen, falls kein Suffix existiert
+        if (!data.video_file.match(/_(120p|360p|720p|1080p)\.mp4$/)) {
+          const filename = data.video_file.replace('.mp4', '_720p.mp4');
+          data.video_file = filename;
+        }
+
         this.videoData = data;
       },
       (error) => {
@@ -234,5 +243,103 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
+  }
+
+  toggleFullscreen(): void {
+    if (!this.target || !this.target.nativeElement) return;
+    const video = this.target.nativeElement;
+
+    if (!document.fullscreenElement) {
+      video.requestFullscreen?.();
+    } else {
+      document.exitFullscreen?.();
+    }
+  }
+
+  toggleMute(): void {
+    if (!this.target || !this.target.nativeElement) return;
+    const video = this.target.nativeElement;
+    video.muted = !video.muted;
+    this.isMuted = video.muted;
+  }
+
+  toggleResolutionPopup(): void {
+    this.isResolutionPopupOpen = !this.isResolutionPopupOpen;
+  }
+
+  setResolution(resolution: string): void {
+    if (!this.videoData || !this.videoData.video_file || !this.target) return;
+
+    const video = this.target.nativeElement;
+    const currentTime = video.currentTime; // Speichere aktuelle Zeit
+    const isPlaying = !video.paused; // Speichere, ob das Video gerade läuft
+
+    let newFile: string;
+    if (this.videoData.video_file.match(/_(120p|360p|720p|1080p)\.mp4$/)) {
+      // Falls bereits eine Auflösung im Dateinamen existiert, ersetze sie
+      newFile = this.videoData.video_file.replace(
+        /_(120p|360p|720p|1080p)\.mp4$/,
+        `_${resolution}.mp4`
+      );
+    } else {
+      // Falls keine Auflösung existiert (z.B. `dateiname.mp4`), hänge die neue Auflösung an
+      newFile = this.videoData.video_file.replace('.mp4', `_${resolution}.mp4`);
+    }
+
+    const newSrc = `http://127.0.0.1:8000${newFile}`;
+
+    // 🔹 Prüfen, ob die Datei existiert
+    fetch(newSrc, { method: 'HEAD' })
+      .then((response) => {
+        if (response.ok) {
+          console.log(`✅ Videoauflösung verfügbar: ${newSrc}`);
+          this.changeVideoSource(video, newSrc, currentTime, isPlaying);
+        } else {
+          throw new Error(`⚠️ Videoauflösung nicht gefunden: ${newSrc}`);
+        }
+      })
+      .catch((error) => {
+        console.warn(error.message);
+        console.warn('🔄 Versuche eine andere verfügbare Auflösung...');
+
+        // Liste der möglichen Auflösungen in absteigender Reihenfolge
+        const resolutions = ['1080p', '720p', '360p', '120p'];
+        const fallbackRes = resolutions.find((res) =>
+          this.videoData.video_file.includes(`_${res}.mp4`)
+        );
+
+        let fallbackFile = this.videoData.video_file; // Standardmäßig Hauptdatei
+
+        if (fallbackRes) {
+          fallbackFile = this.videoData.video_file.replace(
+            /_(120p|360p|720p|1080p)\.mp4$/,
+            `_${fallbackRes}.mp4`
+          );
+        }
+
+        const fallbackSrc = `http://127.0.0.1:8000${fallbackFile}`;
+        console.log(`🔄 Lade stattdessen: ${fallbackSrc}`);
+
+        this.changeVideoSource(video, fallbackSrc, currentTime, isPlaying);
+      });
+  }
+
+  // 🔹 Hilfsfunktion zum Wechseln der Videoquelle
+  changeVideoSource(
+    video: HTMLVideoElement,
+    newSrc: string,
+    currentTime: number,
+    isPlaying: boolean
+  ) {
+    video.src = newSrc;
+    video.load();
+    video.addEventListener(
+      'loadeddata',
+      () => {
+        video.currentTime = currentTime;
+        if (isPlaying) video.play();
+      },
+      { once: true }
+    );
   }
 }
