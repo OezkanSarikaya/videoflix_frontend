@@ -8,6 +8,8 @@ import { VideoplayerComponent } from './videoplayer/videoplayer.component';
 import { ResetPasswordComponent } from './reset-password/reset-password.component';
 import { AuthGuard } from '../app/services/auth.guard';
 import { ActivateComponent } from './activate/activate.component';
+import { LegalNoticeComponent } from './legal-notice/legal-notice.component';
+import { PrivacyPolicyComponent } from './privacy-policy/privacy-policy.component';
 
 
 export const routes: Routes = [
@@ -20,5 +22,8 @@ export const routes: Routes = [
     {path: "videos", component: VideoOfferComponent, canActivate: [AuthGuard]},
     // {path: "videoplayer/:id", component: VideoplayerComponent, canActivate: [AuthGuard]},
     {path: "videoplayer/:videoId", component: VideoplayerComponent, canActivate: [AuthGuard]},
+    {path: "legal-notice", component: LegalNoticeComponent},
+    {path: "privacy-policy", component: PrivacyPolicyComponent},
+    // LegalNoticeComponent
 
 ];

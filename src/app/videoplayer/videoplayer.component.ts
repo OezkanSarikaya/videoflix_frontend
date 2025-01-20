@@ -149,17 +149,17 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
             .subscribe({
               next: (response: boolean) => {
                 this.toastResponse = response;
-                console.log('Toast Response:', response);
+                // console.log('Toast Response:', response);
 
                 if (this.toastResponse) {
                   video.currentTime = res.progress;
                   // this.videoPlayer.currentTime(res.progress);
-                  console.log(
-                    'Video fortgesetzt bei Sekunde:',
-                    res.progress,
-                    'Current Time:',
-                    video.currentTime
-                  );
+                  // console.log(
+                  //   'Video fortgesetzt bei Sekunde:',
+                  //   res.progress,
+                  //   'Current Time:',
+                  //   video.currentTime
+                  // );
                 }
               },
               error: (err) => {
@@ -207,6 +207,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     if (!this.target || !this.target.nativeElement) return;
     const video = this.target.nativeElement;
     video.paused ? video.play() : video.pause();
+    this.isResolutionPopupOpen = false;
   }
 
   rewind(seconds: number): void {

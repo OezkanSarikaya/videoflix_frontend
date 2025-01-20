@@ -14,6 +14,12 @@
   justify-content: center;
 }
 
+button:disabled,
+button[disabled]{
+  background-color: #2E3EDF80;  
+  cursor:not-allowed;
+}
+
 .horizontal-center {
   display: flex;
   justify-content: center;

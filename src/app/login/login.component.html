@@ -20,6 +20,7 @@
             placeholder="Enter a Password"
             [(ngModel)]="password"
             name="password"
+            required
           />
           <img
             *ngIf="!showPassword"
@@ -36,7 +37,15 @@
         </div>
         <label><input type="checkbox" name="rememberme" [(ngModel)]="rememberme" /> Remember me</label>
         <div class="horizontal-center">
-          <button type="submit">Log in</button>
+          <!-- <button type="submit">Log in</button> -->
+
+          @if (loginForm.valid ) {
+            <button type="submit">Log in</button>
+            } @else {
+            <button type="submit" disabled="disabled">Log in</button>
+            }
+
+
         </div>
       </form>
       <div class="card-bottom">
