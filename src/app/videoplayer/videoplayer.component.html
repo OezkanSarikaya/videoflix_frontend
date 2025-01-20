@@ -76,9 +76,14 @@
         <div class="resolution-popup" [class.show]="isResolutionPopupOpen">
           <ul>
             <li 
+              (click)="setOptimalResolution()"
+              [class.selected]="!isUserSelectedResolution">
+              Automatisch ({{ autoDetectedResolution }})
+            </li>
+            <li 
               *ngFor="let res of ['120p', '360p', '720p', '1080p']" 
-              (click)="setResolution(res)"
-              [class.selected]="selectedResolution === res">
+              (click)="userSelectedResolution(res)"
+              [class.selected]="selectedResolution === res && isUserSelectedResolution">
               {{ res }}
             </li>
           </ul>

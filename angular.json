@@ -30,8 +30,8 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.scss",
-              "node_modules/video.js/dist/video-js.css"
+              "src/styles.scss"
+              
             ],
             "scripts": []
           },

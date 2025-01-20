@@ -27,7 +27,10 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   toastResponse: boolean = false;
   isMuted: boolean = false;
   isResolutionPopupOpen: boolean = false;
-  selectedResolution: string = '720p';
+  selectedResolution: string = 'auto';
+  isUserSelectedResolution: boolean = false;
+  autoDetectedResolution: string = '1080p'; // Standardmäßig
+  newFile: string = '';
 
   // @ViewChild('target', { static: false })
   @ViewChild('target', { static: false }) target!: ElementRef<HTMLVideoElement>;
@@ -51,8 +54,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     this.route.paramMap.subscribe((params) => {
       this.videoId = params.get('videoId');
       if (this.videoId) {
-        this.loadVideoData(this.videoId);
-        this.checkVideoProgress(this.videoId);
+        this.loadVideoData(this.videoId);   
+        this.checkVideoProgress(this.videoId);        
       }
     });
 
@@ -60,6 +63,16 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       'beforeunload',
       this.saveProgressBeforeUnload.bind(this)
     );
+
+    window.addEventListener('resize', this.handleResize.bind(this));
+  }
+
+  handleResize(): void {
+    if (!this.isUserSelectedResolution || this.selectedResolution === 'auto') {
+      console.log('resize listener aktiv!');
+
+      this.setOptimalResolution();
+    }
   }
 
   ngAfterViewInit(): void {
@@ -86,9 +99,12 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       'beforeunload',
       this.saveProgressBeforeUnload.bind(this)
     );
+    window.removeEventListener('resize', this.handleResize.bind(this));
+    this.setOptimalResolution();
   }
 
   loadVideoData(id: string): void {
+    
     this.videoService.getVideoById(id).subscribe(
       (data) => {
         // Standardmäßig 720p hinzufügen, falls kein Suffix existiert
@@ -96,8 +112,10 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
           const filename = data.video_file.replace('.mp4', '_720p.mp4');
           data.video_file = filename;
         }
+        console.log('loadVideoData');
 
         this.videoData = data;
+        this.setOptimalResolution();
       },
       (error) => {
         console.error('Error loading video data:', error);
@@ -267,32 +285,54 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isResolutionPopupOpen = !this.isResolutionPopupOpen;
   }
 
+  userSelectedResolution(resolution: string): void {
+    // this.selectedResolution = 'auto';
+    this.isUserSelectedResolution = true;
+    this.setResolution(resolution);
+  }
+
   setResolution(resolution: string): void {
+    // console.log('setResolution: Target:' +this.target.nativeElement);
+    
     if (!this.videoData || !this.videoData.video_file || !this.target) return;
 
     const video = this.target.nativeElement;
     const currentTime = video.currentTime; // Speichere aktuelle Zeit
-    const isPlaying = !video.paused; // Speichere, ob das Video gerade läuft
+    console.log(currentTime);
 
-    let newFile: string;
+    const isPlaying = !video.paused; // Speichere, ob das Video gerade läuft
+    // this.isUserSelectedResolution = true;
+    if (resolution == 'auto') {
+      this.selectedResolution = 'auto';
+      this.isUserSelectedResolution = false;
+    }
+
+    // let newFile: string;
     if (this.videoData.video_file.match(/_(120p|360p|720p|1080p)\.mp4$/)) {
       // Falls bereits eine Auflösung im Dateinamen existiert, ersetze sie
-      newFile = this.videoData.video_file.replace(
+      this.newFile = this.videoData.video_file.replace(
         /_(120p|360p|720p|1080p)\.mp4$/,
         `_${resolution}.mp4`
       );
     } else {
       // Falls keine Auflösung existiert (z.B. `dateiname.mp4`), hänge die neue Auflösung an
-      newFile = this.videoData.video_file.replace('.mp4', `_${resolution}.mp4`);
+      this.newFile = this.videoData.video_file.replace('.mp4', `.mp4`);
     }
-
-    const newSrc = `http://127.0.0.1:8000${newFile}`;
+    if (resolution == 'auto') {
+      this.newFile = this.videoData.video_file;
+    }
+    const newSrc = `http://127.0.0.1:8000${this.newFile}`;
+    console.log('newSrc: ' + newSrc);
 
     // 🔹 Prüfen, ob die Datei existiert
     fetch(newSrc, { method: 'HEAD' })
       .then((response) => {
         if (response.ok) {
           console.log(`✅ Videoauflösung verfügbar: ${newSrc}`);
+
+          this.selectedResolution = resolution;
+          console.log('fetch currentTime: ' + currentTime);
+          // video.currentTime = currentTime;
           this.changeVideoSource(video, newSrc, currentTime, isPlaying);
         } else {
           throw new Error(`⚠️ Videoauflösung nicht gefunden: ${newSrc}`);
@@ -319,7 +359,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         const fallbackSrc = `http://127.0.0.1:8000${fallbackFile}`;
         console.log(`🔄 Lade stattdessen: ${fallbackSrc}`);
-
+        // this.selectedResolution = newSrc;
+        // video.currentTime = currentTime;
         this.changeVideoSource(video, fallbackSrc, currentTime, isPlaying);
       });
   }
@@ -333,13 +374,89 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   ) {
     video.src = newSrc;
     video.load();
-    video.addEventListener(
-      'loadeddata',
-      () => {
+
+    const setTime = () => {
+      if (video.readyState >= 2) {
+        // Prüft, ob genug Daten geladen wurden
         video.currentTime = currentTime;
-        if (isPlaying) video.play();
-      },
-      { once: true }
+        console.log('setTime: ', currentTime, video.currentTime);
+      }
+    };
+
+    const onLoadedMetadata = () => {
+      console.log('loadedmetadata: ' + currentTime, video.currentTime);
+      setTime();
+      video.addEventListener('canplay', onCanPlay);
+      video.removeEventListener('loadedmetadata', onLoadedMetadata);
+    };
+
+    const onCanPlay = () => {
+      console.log('canplay: ' + currentTime, video.currentTime);
+      setTime();
+      video.addEventListener('seeked', onSeeked);
+      video.removeEventListener('canplay', onCanPlay);
+    };
+
+    const onSeeked = () => {
+      console.log('seeked: ' + currentTime, video.currentTime);
+      if (isPlaying) video.play();
+      video.removeEventListener('seeked', onSeeked);
+    };
+
+    video.addEventListener('loadedmetadata', onLoadedMetadata);
+
+    // 🔹 Falls das nicht reicht, versuche nach 100ms erneut
+    setTimeout(() => {
+      console.log('setTimeout fallback: ' + currentTime, video.currentTime);
+      if (video.currentTime === 0) {
+        setTime();
+      }
+    }, 100);
+
+    // 🔹 Letzter Trick: Play/Pause, falls nichts hilft
+    setTimeout(() => {
+      if (video.currentTime === 0) {
+        console.log('Final attempt: Play/Pause Trick');
+        video
+          .play()
+          .then(() => {
+            video.pause();
+            video.currentTime = currentTime;
+            if (isPlaying) video.play();
+          })
+          .catch((err) => console.warn('Play Trick failed:', err));
+      }
+    }, 500);
+  }
+
+  setOptimalResolution(): void {
+
+    if (!this.videoData || !this.videoData.video_file) return;
+
+    this.selectedResolution = 'auto';
+    this.isUserSelectedResolution = false;
+
+    const screenWidth = window.innerWidth;
+    let optimalResolution = '720p';
+
+    if (screenWidth <= 480) {
+      optimalResolution = '120p';
+    } else if (screenWidth <= 854) {
+      optimalResolution = '360p';
+    } else if (screenWidth <= 1280) {
+      optimalResolution = '720p';
+    } else {
+      optimalResolution = '1080p';
+    }
+
+    console.log(
+      'Windows Breite: ' + screenWidth + '; Auflösung: ' + optimalResolution
     );
+
+    this.autoDetectedResolution = optimalResolution; // Speichere die ermittelte Auflösung
+
+    if (!this.isUserSelectedResolution || this.selectedResolution === 'auto') {
+      this.setResolution(optimalResolution);
+    }
   }
 }
