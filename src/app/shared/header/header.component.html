@@ -1,5 +1,7 @@
 <header>
-  <img routerLink="/" src="../../assets/img/Logo.svg" alt="" />
+  <img class="desktop-logo" routerLink="/" src="../../assets/img/Logo.svg" alt="" />
+
+  <img class="mobile-logo" routerLink="/" src="../../assets/img/icons/logo-icon.png" alt="" />
 
   <button *ngIf="authService.isAuthenticated()" (click)="onLogout()"><img src="../../../assets/img/icons/logout.svg" alt=""> Log out</button>
 

@@ -1,9 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../app/services/auth.service'; 
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from "../shared/header/header.component";
 import { FooterComponent } from "../shared/footer/footer.component";
 import { FormsModule, NgForm } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
 // import { NgModule } from '@angular/core';
 
 @Component({
@@ -13,7 +14,7 @@ import { FormsModule, NgForm } from '@angular/forms';
   templateUrl: './signup.component.html',
   styleUrl: './signup.component.scss'
 })
-export class SignupComponent {
+export class SignupComponent implements OnInit {
   password: string = '';
   password_confirmed: string = '';
   showPassword: boolean = false;
@@ -21,7 +22,16 @@ export class SignupComponent {
   errorMessage: string = '';
   showSuccessMessage: boolean = false;
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private route: ActivatedRoute) {}
+
+  ngOnInit() {
+    // E-Mail aus Query-Params übernehmen, falls vorhanden
+    this.route.queryParams.subscribe(params => {
+      if (params['email']) {
+        this.email = params['email'];
+      }
+    });
+  }
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;

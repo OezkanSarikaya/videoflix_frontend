@@ -4,10 +4,13 @@
     <div class="content">
       <h2>Movies, TV shows, and more</h2>
       <p>Enter your email to create or restart your subscription.</p>
-      <form>
-        <input type="email" placeholder="Email Address" />
-        <button routerLink="/signup">Sign Up ></button>
-      </form>
+      <!-- <form> -->
+        <input type="email" [(ngModel)]="email" placeholder="Email Address" #emailRef="ngModel" />
+        <div *ngIf="emailRef.invalid && emailRef.touched">
+          ❌ Bitte eine gültige E-Mail eingeben!
+        </div>
+        <button (click)="goToSignup()">Sign Up ></button>
+      <!-- </form> -->
     </div>
     <app-footer></app-footer>
   </div>

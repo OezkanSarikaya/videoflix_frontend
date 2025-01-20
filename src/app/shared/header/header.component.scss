@@ -13,3 +13,19 @@ header {
       gap:4px;
     }
   }
+
+  .mobile-logo {
+    display: none;
+  }
+
+  @media only screen and (max-width: 600px) {
+    .mobile-logo {
+      display: block;
+      height:32px;
+    }
+    .desktop-logo {
+      display: none;
+    }
+
+  }
+

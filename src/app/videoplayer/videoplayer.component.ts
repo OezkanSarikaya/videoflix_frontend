@@ -13,11 +13,12 @@ import { VideoService } from '../../app/services/videos/video.service';
 import { VideoProgressService } from '../../app/services/videos/video-progress.service';
 import { CommonModule } from '@angular/common';
 import { ToastService } from './../services/toast/toast.service';
+import { HeaderComponent } from "../shared/header/header.component";
 
 @Component({
   selector: 'app-videoplayer',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink],
+  imports: [CommonModule, RouterOutlet, RouterLink, HeaderComponent],
   templateUrl: './videoplayer.component.html',
   styleUrls: ['./videoplayer.component.scss'],
 })
