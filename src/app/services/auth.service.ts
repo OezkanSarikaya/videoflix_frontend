@@ -60,12 +60,14 @@ export class AuthService {
 
   // Login-Methode
   login(email: string, password: string, rememberme: boolean): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/users/login/`, { email, password }).pipe(
-      tap((tokens) => {
-        this.storeTokens(tokens, rememberme);
-        this.startRefreshTokenTimer();
-      })
-    );
+    return this.http
+      .post<any>(`${this.apiUrl}/api/users/login/`, { email, password })
+      .pipe(
+        tap((tokens) => {
+          this.storeTokens(tokens, rememberme);
+          this.startRefreshTokenTimer();
+        })
+      );
   }
 
   // Signup-Methode
@@ -76,16 +78,24 @@ export class AuthService {
 
   // Passwort zurücksetzen anfordern
   forgotPassword(email: string): Observable<any> {
-    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, { email });
+    return this.http.post<any>(`${this.apiUrl}/api/users/password_reset/`, {
+      email,
+    });
   }
 
   // Reset-Token validieren
   validateResetToken(uid: string, token: string): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`);
+    return this.http.get<any>(
+      `${this.apiUrl}/api/users/password_reset/confirm/${uid}/${token}`
+    );
   }
 
   // Passwort zurücksetzen
-  resetPassword(uid: string, token: string, newPassword: string): Observable<any> {
+  resetPassword(
+    uid: string,
+    token: string,
+    newPassword: string
+  ): Observable<any> {
     const payload = {
       new_password1: newPassword,
       new_password2: newPassword,
@@ -143,37 +153,46 @@ export class AuthService {
   // Refresh Token Methode
   refreshToken(): Observable<any> {
     const refreshToken = this.getRefreshToken();
-  
+
     if (!refreshToken) {
       console.warn('⚠️ Kein Refresh Token gefunden! Benutzer wird ausgeloggt.');
       this.logout();
       return throwError(() => new Error('No refresh token found'));
     }
-  
-    return this.http.post<any>(`${this.apiUrl}/api/users/token/refresh/`, { refresh: refreshToken }).pipe(
-      tap({
-        next: (tokens) => {
-          console.log('✅ Refresh erfolgreich:', tokens);
-          const rememberme = !!localStorage.getItem('accessToken');
-          this.storeTokens(tokens, rememberme);
-          this.startRefreshTokenTimer();
-        },
-        error: (error) => {
-          console.error('❌ Refresh fehlgeschlagen:', error);
-  
-          // Falls der Server 401 zurückgibt -> Logout
-          if (error.status === 401) {
-            console.warn('⛔ Refresh Token abgelaufen! Benutzer wird ausgeloggt.');
-            this.logout();
-          }
-        }
+
+    return this.http
+      .post<any>(`${this.apiUrl}/api/users/token/refresh/`, {
+        refresh: refreshToken,
       })
-    );
+      .pipe(
+        tap({
+          next: (tokens) => {
+            console.log('✅ Refresh erfolgreich:', tokens);
+            const rememberme = !!localStorage.getItem('accessToken');
+            this.storeTokens(tokens, rememberme);
+            this.startRefreshTokenTimer();
+          },
+          error: (error) => {
+            console.error('❌ Refresh fehlgeschlagen:', error);
+
+            // Falls der Server 401 zurückgibt -> Logout
+            if (error.status === 401) {
+              console.warn(
+                '⛔ Refresh Token abgelaufen! Benutzer wird ausgeloggt.'
+              );
+              this.logout();
+            }
+          },
+        })
+      );
   }
 
   // Hol den Refresh Token
   private getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken');
+    return (
+      localStorage.getItem('refreshToken') ||
+      sessionStorage.getItem('refreshToken')
+    );
   }
 
   // Speichere Tokens im Storage
