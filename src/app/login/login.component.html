@@ -5,15 +5,23 @@
       <h2>Log in</h2>
       <!-- <form (ngSubmit)="login(loginForm)" #loginForm="ngForm"> -->
       <form (ngSubmit)="login()" #loginForm="ngForm">
+        <div>
         <input
+        class="input"
           type="email"
           placeholder="Email Address"
           [(ngModel)]="email"
           name="email"
           pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+          #emailRef="ngModel"
           required
 
         />
+        <div class="form-error" *ngIf="emailRef.invalid && emailRef.touched">
+          <img src="../../assets/img/icons/warning.png" alt="" /> Email format
+          invalid
+        </div>
+      </div>
         <div class="password-container">
           <input
             [type]="showPassword ? 'text' : 'password'"
