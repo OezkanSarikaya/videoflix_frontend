@@ -17,11 +17,11 @@ import { HttpClient } from '@angular/common/http';
 export class VideoOfferComponent implements OnInit {
   videos: any[] = [];
   error: string | null = null;
-  trailerId: number = 18;
+  trailerId: number = 42; // autodetect this number!!!
   trailerTitle: string = 'Breakout';
   trailerDescription: string =
     'In a high-security prison, a wrongly convicted man formulates a meticulous plan to break out and prove his innocence. He must navigate a web of alliances and betrayals to reclaim his freedom and expose the truth.';
-  trailerVideoUrl: string = '/media/videos/breakout_720p.mp4';
+  trailerVideoUrl: string = '/media/videos/breakout-with-sound_720p.mp4';
   videosWithProgress: any[] = [];
 
   @ViewChild('trailer') trailerVideoElement!: ElementRef<HTMLVideoElement>;

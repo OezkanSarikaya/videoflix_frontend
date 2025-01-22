@@ -35,7 +35,8 @@
 }
 
 input {
-  width: 360px;
+  max-width: 360px;
+  width:100%;
   background-color: transparent !important;
   padding: 12px 24px;
   gap: 10px;
@@ -78,4 +79,16 @@ h2 {
   line-height: 62.5px;
   text-align: left;
   margin: 0;
+}
+
+@media only screen and (max-width: 600px) {
+  .content {
+    justify-content: center;
+  }
+  h2 {
+    text-align: center;
+  }
+  .max-width {
+    padding: 10px 24px;
+  }
 }
