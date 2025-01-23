@@ -13,7 +13,7 @@ import { VideoService } from '../../app/services/videos/video.service';
 import { VideoProgressService } from '../../app/services/videos/video-progress.service';
 import { CommonModule } from '@angular/common';
 import { ToastService } from './../services/toast/toast.service';
-import { HeaderComponent } from "../shared/header/header.component";
+import { HeaderComponent } from '../shared/header/header.component';
 
 @Component({
   selector: 'app-videoplayer',
@@ -23,6 +23,7 @@ import { HeaderComponent } from "../shared/header/header.component";
   styleUrls: ['./videoplayer.component.scss'],
 })
 export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
+  private handleResizeBound = this.handleResize.bind(this);
   videoId: string | null = null;
   videoData: any = null;
   toastResponse: boolean = false;
@@ -55,8 +56,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     this.route.paramMap.subscribe((params) => {
       this.videoId = params.get('videoId');
       if (this.videoId) {
-        this.loadVideoData(this.videoId);   
-        this.checkVideoProgress(this.videoId);        
+        this.loadVideoData(this.videoId);
+        this.checkVideoProgress(this.videoId);
       }
     });
 
@@ -65,13 +66,13 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       this.saveProgressBeforeUnload.bind(this)
     );
 
-    window.addEventListener('resize', this.handleResize.bind(this));
+    // window.addEventListener('resize', this.handleResize.bind(this));
+    window.addEventListener('resize', this.handleResizeBound);
   }
 
   handleResize(): void {
     if (!this.isUserSelectedResolution || this.selectedResolution === 'auto') {
       console.log('resize listener aktiv!');
-
       this.setOptimalResolution();
     }
   }
@@ -95,17 +96,22 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
+    window.removeEventListener('resize', this.handleResizeBound);
+
     this.saveProgress();
     window.removeEventListener(
       'beforeunload',
       this.saveProgressBeforeUnload.bind(this)
     );
-    window.removeEventListener('resize', this.handleResize.bind(this));
+
+    if (this.target?.nativeElement && !this.target.nativeElement.paused) {
+      this.target.nativeElement.pause();
+    }
+
     this.setOptimalResolution();
   }
 
   loadVideoData(id: string): void {
-    
     this.videoService.getVideoById(id).subscribe(
       (data) => {
         // Standardmäßig 720p hinzufügen, falls kein Suffix existiert
@@ -295,7 +301,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   setResolution(resolution: string): void {
     // console.log('setResolution: Target:' +this.target.nativeElement);
-    
+
     if (!this.videoData || !this.videoData.video_file || !this.target) return;
 
     const video = this.target.nativeElement;
@@ -432,7 +438,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   setOptimalResolution(): void {
-
     if (!this.videoData || !this.videoData.video_file) return;
 
     this.selectedResolution = 'auto';
