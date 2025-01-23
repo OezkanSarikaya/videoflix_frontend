@@ -13,6 +13,7 @@
         <div>
           <input
             class="input"
+            [ngClass]="{'red-border': emailRef.invalid && emailRef.touched}"
             type="email"
             [(ngModel)]="email"
             name="email"
@@ -27,7 +28,7 @@
           </div>
         </div>
         <div>
-          <div class="password-container">
+          <div class="password-container" [ngClass]="{'red-border': passwordRef.invalid && passwordRef.touched}">
             <input
               [type]="showPassword ? 'text' : 'password'"
               placeholder="Enter a Password"
@@ -59,7 +60,7 @@
           </div>
         </div>
         <div>
-          <div class="password-container">
+          <div class="password-container" [ngClass]="{'red-border': confirmPasswordRef.invalid && confirmPasswordRef.touched}">
             <input
               [type]="showPassword ? 'text' : 'password'"
               placeholder="Confirm Password"

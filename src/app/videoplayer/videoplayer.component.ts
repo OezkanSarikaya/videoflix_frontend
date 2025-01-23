@@ -66,7 +66,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       this.saveProgressBeforeUnload.bind(this)
     );
 
-    // window.addEventListener('resize', this.handleResize.bind(this));
     window.addEventListener('resize', this.handleResizeBound);
   }
 
@@ -300,8 +299,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   setResolution(resolution: string): void {
-    // console.log('setResolution: Target:' +this.target.nativeElement);
-
     if (!this.videoData || !this.videoData.video_file || !this.target) return;
 
     const video = this.target.nativeElement;

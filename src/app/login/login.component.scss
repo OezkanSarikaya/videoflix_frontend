@@ -14,12 +14,6 @@
   justify-content: center;
 }
 
-button:disabled,
-button[disabled]{
-  background-color: #2E3EDF80;  
-  cursor:not-allowed;
-}
-
 .horizontal-center {
   display: flex;
   justify-content: center;
@@ -54,34 +48,22 @@ button[disabled]{
     font-weight: 400;
     line-height: 19.2px;
     label {
-        display: flex;
-        align-items: center;
-        gap:4px;
-        height:23px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      height: 23px;
     }
   }
 
-  // input {
-  //   border: 1px solid #2e3edf;
-  //   padding: 12px 24px;
-  //   gap: 10px;
-  //   border-radius: 12px;
-  //   height:24px;
-  //   outline: none;
-  //   font-size: 18px;
-  //   font-weight: 400;
-  //   line-height: 23.44px;
-  // }
-
   .input {
-    border: 1px solid #2e3edf;    
+    border: 1px solid #2e3edf;
     gap: 10px;
     border-radius: 12px;
     // height: 24px;
     outline: none;
     font-size: 18px;
     font-weight: 400;
-    line-height: 23.44px;   
+    line-height: 23.44px;
     box-sizing: border-box;
     width: 100%;
     margin: 0;
@@ -95,18 +77,6 @@ button[disabled]{
     line-height: 23.44px;
     text-align: left;
     color: #2e3edf;
-  }
-
-  .form-error {
-    margin-top: 4px;
-    color: #ff002e;
-    font-size: 16px;
-    font-weight: 400;
-    line-height: 19.53px;
-    text-align: left;
-    display: flex;
-    align-items: center;
-    gap: 4px;
   }
 
   h2 {
