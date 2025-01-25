@@ -3,7 +3,7 @@
     <video
       #target
       id="target"
-      [src]="'http://127.0.0.1:8000' + videoData.video_file"
+      [src]="apiUrl + videoData.video_file"
       (timeupdate)="updateSeekbar()"
     ></video>
 
