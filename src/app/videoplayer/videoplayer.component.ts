@@ -5,8 +5,7 @@ import {
   AfterViewInit,
   OnInit,
   OnDestroy,
-  Input,
-  ViewEncapsulation,
+  ChangeDetectorRef,
 } from '@angular/core';
 import { RouterLink, RouterOutlet, ActivatedRoute } from '@angular/router';
 import { VideoService } from '../../app/services/videos/video.service';
@@ -23,7 +22,6 @@ import { HeaderComponent } from '../shared/header/header.component';
   styleUrls: ['./videoplayer.component.scss'],
 })
 export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
-  private handleResizeBound = this.handleResize.bind(this);
   videoId: string | null = null;
   videoData: any = null;
   toastResponse: boolean = false;
@@ -31,25 +29,30 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   isResolutionPopupOpen: boolean = false;
   selectedResolution: string = 'auto';
   isUserSelectedResolution: boolean = false;
-  autoDetectedResolution: string = '1080p'; // Standardmäßig
+  // autoDetectedResolution: string = '1080p'; // Standardmäßig
   newFile: string = '';
+  speedMbps: number = 0; // Netzwerkgeschwindigkeit in Mbit/s
+  testCount: number = 0;
+  resolution = '120p';
+  private maxTests: number = 5;
+  private intervalId: any; // Referenz für das Interval
 
-  // @ViewChild('target', { static: false })
   @ViewChild('target', { static: false }) target!: ElementRef<HTMLVideoElement>;
-  // target!: ElementRef;
   @ViewChild('seekbar') seekbar!: ElementRef<HTMLInputElement>;
 
   seekbarValue: number = 0;
   videoDuration: string = '00:00';
   currentTime: number = 0;
   myPlayer: any = null;
+  resizeListener!: () => void;
 
   constructor(
     private route: ActivatedRoute,
     private videoService: VideoService,
     private progressService: VideoProgressService,
     private toastService: ToastService,
-    private elementRef: ElementRef
+    private cdr: ChangeDetectorRef,
+    private elementRef: ElementRef // private elementRef: ElementRef
   ) {}
 
   ngOnInit(): void {
@@ -65,18 +68,19 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       'beforeunload',
       this.saveProgressBeforeUnload.bind(this)
     );
-
-    window.addEventListener('resize', this.handleResizeBound);
-  }
-
-  handleResize(): void {
-    if (!this.isUserSelectedResolution || this.selectedResolution === 'auto') {
-      console.log('resize listener aktiv!');
-      this.setOptimalResolution();
-    }
   }
 
   ngAfterViewInit(): void {
+    this.startNetworkTest();
+    this.determineOptimalResolution();
+
+    // Bildschirmgröße überwachen (aber keine neuen Netzwerk-Tests starten!)
+    this.resizeListener = () => {
+      this.cdr.detectChanges();
+      this.determineOptimalResolution();
+    };
+    window.addEventListener('resize', this.resizeListener);
+
     if (this.target) {
       const video = this.target.nativeElement;
 
@@ -95,8 +99,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    window.removeEventListener('resize', this.handleResizeBound);
-
     this.saveProgress();
     window.removeEventListener(
       'beforeunload',
@@ -107,7 +109,83 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       this.target.nativeElement.pause();
     }
 
-    this.setOptimalResolution();
+    this.determineOptimalResolution();
+
+    window.removeEventListener('resize', this.resizeListener);
+    clearInterval(this.intervalId);
+  }
+
+  measureNetworkSpeed(): void {
+    if ('connection' in navigator) {
+      const connection = (navigator as any).connection;
+      if (connection && connection.downlink) {
+        setTimeout(() => {
+          // 🔥 Verhindert NG0100-Fehler
+          this.speedMbps = connection.downlink;
+          this.testCount++;
+          // console.log(
+          //   `🔹 Messung #${this.testCount}: ${this.speedMbps.toFixed(2)} Mbit/s`
+          // );
+          this.cdr.detectChanges();
+        }, 0);
+      }
+    }
+  }
+
+  startNetworkTest(): void {
+    this.measureNetworkSpeed(); // Erste Messung sofort ausführen
+
+    this.intervalId = setInterval(() => {
+      if (this.testCount >= this.maxTests) {
+        clearInterval(this.intervalId); // Stoppe weitere Messungen
+        // console.log('🚀 Messungen abgeschlossen.');
+        return;
+      }
+      this.measureNetworkSpeed();
+    }, 1000); // Alle 1 Sekunden, max. 5x
+  }
+
+  determineOptimalResolution(): void {
+    if (!this.isUserSelectedResolution) {
+      setTimeout(() => {
+        const screenWidth = window.innerWidth;
+        // Standardmäßig die niedrigste Qualität
+
+        if (this.speedMbps > 5 && screenWidth >= 1280) {
+          this.resolution = '1080p';
+        } else if (this.speedMbps > 2.5 && screenWidth >= 1024) {
+          this.resolution = '720p';
+        } else if (this.speedMbps > 0.5 && screenWidth >= 480) {
+          this.resolution = '360p';
+        } else {
+          this.resolution = '120p'; // Für extrem langsame Verbindungen oder kleine Bildschirme
+        }
+
+        if (this.selectedResolution !== this.resolution) {
+          this.selectedResolution = this.resolution;
+          // console.log(
+          //   `📺 Neue Auflösung: ${
+          //     this.resolution
+          //   } (Netzwerk: ${this.speedMbps.toFixed(
+          //     2
+          //   )} Mbit/s, Bildschirm: ${screenWidth}px)`
+          // );
+          this.cdr.detectChanges();
+          if (
+            !this.isUserSelectedResolution ||
+            this.selectedResolution === 'auto'
+          ) {
+            // console.log('test' + this.resolution);
+            this.toastService.showToast(
+              `Die Videoauflösung wurde automatisch auf ${this.resolution} optimiert!`,
+              false
+            );
+
+            this.setResolution(this.resolution);
+          }
+        }
+      }, 0);
+    }
   }
 
   loadVideoData(id: string): void {
@@ -118,10 +196,10 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
           const filename = data.video_file.replace('.mp4', '_720p.mp4');
           data.video_file = filename;
         }
-        console.log('loadVideoData');
+        // console.log('loadVideoData');
 
         this.videoData = data;
-        this.setOptimalResolution();
+        this.determineOptimalResolution();
       },
       (error) => {
         console.error('Error loading video data:', error);
@@ -139,7 +217,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
         // Warten, bis die Metadaten geladen sind
         video.addEventListener('loadedmetadata', () => {
-          console.log('Metadaten geladen:', video.duration);
+          // console.log('Metadaten geladen:', video.duration);
 
           this.videoDuration = this.formatTime(video.duration);
           this.currentTime = video.currentTime;
@@ -159,13 +237,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
                 if (this.toastResponse) {
                   video.currentTime = res.progress;
-                  // this.videoPlayer.currentTime(res.progress);
-                  // console.log(
-                  //   'Video fortgesetzt bei Sekunde:',
-                  //   res.progress,
-                  //   'Current Time:',
-                  //   video.currentTime
-                  // );
                 }
               },
               error: (err) => {
@@ -218,6 +289,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   rewind(seconds: number): void {
     if (this.target) {
+      // console.log('rewind' +this.target);
       const video = this.target.nativeElement;
       video.currentTime = Math.max(video.currentTime - seconds, 0);
       this.currentTime = video.currentTime;
@@ -235,6 +307,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   updateSeekbar(): void {
+    // console.log('updateSeekbar');
     if (this.target) {
       const video = this.target.nativeElement;
       this.seekbarValue = (video.currentTime / video.duration) * 100;
@@ -303,9 +376,10 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     const video = this.target.nativeElement;
     const currentTime = video.currentTime; // Speichere aktuelle Zeit
-    console.log(currentTime);
+    // console.log(currentTime);
 
     const isPlaying = !video.paused; // Speichere, ob das Video gerade läuft
+
     // this.isUserSelectedResolution = true;
     if (resolution == 'auto') {
       this.selectedResolution = 'auto';
@@ -327,16 +401,16 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       this.newFile = this.videoData.video_file;
     }
     const newSrc = `http://127.0.0.1:8000${this.newFile}`;
-    console.log('newSrc: ' + newSrc);
+    // console.log('newSrc: ' + newSrc);
 
     // 🔹 Prüfen, ob die Datei existiert
     fetch(newSrc, { method: 'HEAD' })
       .then((response) => {
         if (response.ok) {
-          console.log(`✅ Videoauflösung verfügbar: ${newSrc}`);
+          // console.log(`✅ Videoauflösung verfügbar: ${newSrc}`);
 
           this.selectedResolution = resolution;
-          console.log('fetch currentTime: ' + currentTime);
+          // console.log('fetch currentTime: ' + currentTime);
           // video.currentTime = currentTime;
           this.changeVideoSource(video, newSrc, currentTime, isPlaying);
         } else {
@@ -363,7 +437,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
         }
 
         const fallbackSrc = `http://127.0.0.1:8000${fallbackFile}`;
-        console.log(`🔄 Lade stattdessen: ${fallbackSrc}`);
+        // console.log(`🔄 Lade stattdessen: ${fallbackSrc}`);
         // this.selectedResolution = newSrc;
         // video.currentTime = currentTime;
         this.changeVideoSource(video, fallbackSrc, currentTime, isPlaying);
@@ -389,21 +463,21 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     };
 
     const onLoadedMetadata = () => {
-      console.log('loadedmetadata: ' + currentTime, video.currentTime);
+      // console.log('loadedmetadata: ' + currentTime, video.currentTime);
       setTime();
       video.addEventListener('canplay', onCanPlay);
       video.removeEventListener('loadedmetadata', onLoadedMetadata);
     };
 
     const onCanPlay = () => {
-      console.log('canplay: ' + currentTime, video.currentTime);
+      // console.log('canplay: ' + currentTime, video.currentTime);
       setTime();
       video.addEventListener('seeked', onSeeked);
       video.removeEventListener('canplay', onCanPlay);
     };
 
     const onSeeked = () => {
-      console.log('seeked: ' + currentTime, video.currentTime);
+      // console.log('seeked: ' + currentTime, video.currentTime);
       if (isPlaying) video.play();
       video.removeEventListener('seeked', onSeeked);
     };
@@ -412,7 +486,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
     // 🔹 Falls das nicht reicht, versuche nach 100ms erneut
     setTimeout(() => {
-      console.log('setTimeout fallback: ' + currentTime, video.currentTime);
+      // console.log('setTimeout fallback: ' + currentTime, video.currentTime);
       if (video.currentTime === 0) {
         setTime();
       }
@@ -421,7 +495,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     // 🔹 Letzter Trick: Play/Pause, falls nichts hilft
     setTimeout(() => {
       if (video.currentTime === 0) {
-        console.log('Final attempt: Play/Pause Trick');
+        // console.log('Final attempt: Play/Pause Trick');
         video
           .play()
           .then(() => {
@@ -432,35 +506,5 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
           .catch((err) => console.warn('Play Trick failed:', err));
       }
     }, 500);
-  }
-
-  setOptimalResolution(): void {
-    if (!this.videoData || !this.videoData.video_file) return;
-
-    this.selectedResolution = 'auto';
-    this.isUserSelectedResolution = false;
-
-    const screenWidth = window.innerWidth;
-    let optimalResolution = '720p';
-
-    if (screenWidth <= 480) {
-      optimalResolution = '120p';
-    } else if (screenWidth <= 854) {
-      optimalResolution = '360p';
-    } else if (screenWidth <= 1280) {
-      optimalResolution = '720p';
-    } else {
-      optimalResolution = '1080p';
-    }
-
-    console.log(
-      'Windows Breite: ' + screenWidth + '; Auflösung: ' + optimalResolution
-    );
-
-    this.autoDetectedResolution = optimalResolution; // Speichere die ermittelte Auflösung
-
-    if (!this.isUserSelectedResolution || this.selectedResolution === 'auto') {
-      this.setResolution(optimalResolution);
-    }
   }
 }

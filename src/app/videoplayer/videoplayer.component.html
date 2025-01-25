@@ -1,31 +1,35 @@
-
 <div class="wrapper">
-  
-
   <div class="container" *ngIf="videoData">
-  <video
+    <video
       #target
       id="target"
       [src]="'http://127.0.0.1:8000' + videoData.video_file"
       (timeupdate)="updateSeekbar()"
-    ></video>   
+    ></video>
 
-
-  <div class="overlay">
-    <div class="topIcons">
-      <div class="topLeftIcons">
-        <img
-          src="../../assets/img/icons/arrow_back.png"
-          alt=""
-          routerLink="/videos"
-        />
+    <div class="overlay">
+      <div class="topIcons">
+        <div class="topLeftIcons">
+          <img
+            src="../../assets/img/icons/arrow_back.png"
+            alt=""
+            routerLink="/videos"
+          />
+        </div>
+        <div class="topMiddleText">
+          Optimizing video for your screen {{ testCount * 20 }}% ({{
+            selectedResolution
+          }})
+        </div>
+        <div class="topRightIcons">
+          <img
+            src="../../assets/img/icons/logo-icon.png"
+            alt=""
+            routerLink="/"
+          />
+        </div>
       </div>
-      <div class="topMiddleText">Optimizing video for your screen 40%</div>
-      <div class="topRightIcons">
-        <img src="../../assets/img/icons/logo-icon.png" alt="" routerLink="/" />
-      </div>
-    </div>
-    <div class="bottom-controls">
+      <div class="bottom-controls">
         <div class="custom-controls">
           <input
             type="range"
@@ -62,42 +66,55 @@
               alt=""
               (click)="forward(10)"
             />
-            <img src="../../assets/img/icons/volume_up.png" *ngIf="!isMuted" alt="" (click)="toggleMute()" />
-            <img src="../../assets/img/icons/volume_off.png" *ngIf="isMuted" alt="" (click)="toggleMute()" />
+            <img
+              src="../../assets/img/icons/volume_up.png"
+              *ngIf="!isMuted"
+              alt=""
+              (click)="toggleMute()"
+            />
+            <img
+              src="../../assets/img/icons/volume_off.png"
+              *ngIf="isMuted"
+              alt=""
+              (click)="toggleMute()"
+            />
           </div>
           <div class="middleTitle">{{ videoData.title }}</div>
           <div class="rightIcons">
             <img src="../../assets/img/icons/subtitles.png" alt="" />
-            <img src="../../assets/img/icons/speed.png" alt="" (click)="toggleResolutionPopup()" />
-            <img src="../../assets/img/icons/fullscreen.png" alt="" (click)="toggleFullscreen()" />
+            <img
+              src="../../assets/img/icons/speed.png"
+              alt=""
+              (click)="toggleResolutionPopup()"
+            />
+            <img
+              src="../../assets/img/icons/fullscreen.png"
+              alt=""
+              (click)="toggleFullscreen()"
+            />
           </div>
         </div>
 
-
-
         <div class="resolution-popup" [class.show]="isResolutionPopupOpen">
           <ul>
-            <li 
-              (click)="setOptimalResolution()"
-              [class.selected]="!isUserSelectedResolution">
-              Automatisch ({{ autoDetectedResolution }})
+            <li
+              (click)="determineOptimalResolution()"
+              [class.selected]="!isUserSelectedResolution"
+            >
+              Automatisch ({{ this.resolution }})
             </li>
-            <li 
-              *ngFor="let res of ['120p', '360p', '720p', '1080p']" 
+            <li
+              *ngFor="let res of ['120p', '360p', '720p', '1080p']"
               (click)="userSelectedResolution(res)"
-              [class.selected]="selectedResolution === res && isUserSelectedResolution">
+              [class.selected]="
+                selectedResolution === res && isUserSelectedResolution
+              "
+            >
               {{ res }}
             </li>
           </ul>
         </div>
-
-
-
       </div>
-  </div>
+    </div>
   </div>
 </div>
-
-
-
-
