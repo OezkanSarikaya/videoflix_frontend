@@ -7,6 +7,8 @@
       (timeupdate)="updateSeekbar()"
     ></video>
 
+   
+
     <div class="overlay">
       <div class="topIcons">
         <div class="topLeftIcons">
@@ -17,7 +19,7 @@
           />
         </div>
         <div class="topMiddleText">
-          Optimizing video for your screen {{ testCount * 20 }}% ({{
+          Optimizing video for your screen {{bufferedPercent.toFixed()}}% ({{
             selectedResolution
           }})
         </div>
@@ -117,4 +119,7 @@
       </div>
     </div>
   </div>
+
+
+
 </div>

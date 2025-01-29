@@ -13,12 +13,17 @@ export class VideoProgressService {
 
   // Fortschritt speichern
   saveProgress(videoId: number, progress: number): Observable<any> {
+  
+
+
+    
     const headers = this.getAuthHeaders();
     return this.http.post(
       this.apiUrl,
       { video: videoId, progress },
       { headers }
     );
+ 
   }
 
   // Fortschritt abrufen
