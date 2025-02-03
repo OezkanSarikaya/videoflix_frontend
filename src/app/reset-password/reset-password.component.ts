@@ -32,20 +32,6 @@ export class ResetPasswordComponent implements OnInit {
     this.uid = this.route.snapshot.paramMap.get('uid') || '';
     this.token = this.route.snapshot.paramMap.get('token') || '';
 
-    // this.uid = this.route.snapshot.queryParamMap.get('uid') || '';
-    // this.token = this.route.snapshot.queryParamMap.get('token') || '';
-
-    console.log(this.uid, this.token);
-
-    // Token validieren
-    // this.authService.validateResetToken(this.uid, this.token).subscribe({
-    //   next: () => {
-    //     this.resetStatus = 'valid';
-    //   },
-    //   error: () => {
-    //     this.resetStatus = 'invalid';
-    //   }
-    // });
       // Überprüfen, ob uid und token vorhanden sind
   if (this.uid && this.token) {
     this.authService.validateResetToken(this.uid, this.token).subscribe({
@@ -60,21 +46,6 @@ export class ResetPasswordComponent implements OnInit {
     });
   }
   }
-
-    // Funktion zum Validieren des Tokens im Backend
-    // validateToken(uid: string, token: string): void {
-    //   this.authService.validateResetToken(uid, token).subscribe({
-    //     next: () => {
-    //       this.activationStatus = 'success';  // Token ist gültig
-    //       console.log(this.activationStatus);
-          
-    //     },
-    //     error: () => {
-    //       this.activationStatus = 'error';  // Token ist ungültig
-    //       console.log(this.activationStatus);
-    //     }
-    //   });
-    // }
 
       // Passwortänderung absenden
     resetPassword(): void {

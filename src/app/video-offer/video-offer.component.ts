@@ -1,4 +1,10 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ViewChild,
+  ElementRef,
+} from '@angular/core';
 import { HeaderComponent } from '../shared/header/header.component';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { Router, RouterLink } from '@angular/router';
@@ -6,6 +12,7 @@ import { VideoService } from '../../app/services/videos/video.service'; // Der S
 import { AuthService } from '../../app/services/auth.service'; // Dein AuthService
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../environment/environment';
 
 @Component({
   selector: 'app-video-offer',
@@ -14,8 +21,9 @@ import { HttpClient } from '@angular/common/http';
   templateUrl: './video-offer.component.html',
   styleUrl: './video-offer.component.scss',
 })
-export class VideoOfferComponent implements OnInit {
+export class VideoOfferComponent implements OnInit, OnDestroy {
   videos: any[] = [];
+  apiUrl = environment.apiUrl;
   activeThumbnailId: number | null = null;
   error: string | null = null;
   trailerId: number = 42; // autodetect this number!!!
@@ -34,40 +42,70 @@ export class VideoOfferComponent implements OnInit {
     private router: Router
   ) {}
 
+  ngOnDestroy(): void {
+    // Event-Listener entfernen, um Speicherlecks zu vermeiden
+    window.removeEventListener('resize', this.handleResize);
+  }
+
+  handleResize = () => {
+    const isMobile = window.innerWidth < 600;
+    const videoPreview = document.querySelector(
+      '.video-preview'
+    ) as HTMLElement;
+    const videoContent = document.querySelector(
+      '.video-content'
+    ) as HTMLElement;
+    const videoOverlay = document.querySelector(
+      '.video-overlay'
+    ) as HTMLElement;
+
+    if (isMobile) {
+      videoContent?.classList.add('hidden');
+      videoPreview?.setAttribute('style', 'display: unset;');
+      videoOverlay?.setAttribute('style', 'display: unset;');
+    } else {
+      videoContent?.classList.remove('hidden');
+      videoPreview?.setAttribute('style', 'display: block;');
+      videoOverlay?.setAttribute('style', 'display: flex;');
+    }
+  };
+
   openVideoPlayer(videoId: string): void {
     // Navigiere zur Video-Player-Seite und übergebe die Video-ID
-    // console.log(videoId);
-    
-
     this.router.navigate(['/videoplayer/', videoId]);
   }
 
   ngOnInit(): void {
     this.loadVideos();
     this.loadVideosWithProgress();
+    window.addEventListener('resize', this.handleResize);
   }
 
   setActiveThumbnail(id: number): void {
     this.activeThumbnailId = id;
   }
-  
+
   handleKeydown(event: KeyboardEvent): void {
     const currentThumbnail = event.target as HTMLElement;
     const parentDiv = currentThumbnail.parentElement;
-  
+
     let nextElement: HTMLElement | null = null;
-  
+
     if (event.key === 'ArrowRight') {
-      nextElement = parentDiv?.nextElementSibling?.querySelector('img') as HTMLElement;
+      nextElement = parentDiv?.nextElementSibling?.querySelector(
+        'img'
+      ) as HTMLElement;
     } else if (event.key === 'ArrowLeft') {
-      nextElement = parentDiv?.previousElementSibling?.querySelector('img') as HTMLElement;
+      nextElement = parentDiv?.previousElementSibling?.querySelector(
+        'img'
+      ) as HTMLElement;
     }
-  
+
     if (nextElement) {
       nextElement.focus(); // Setzt den Fokus auf das nächste Thumbnail
       const movieId = nextElement.getAttribute('data-movie-id');
-      this.setActiveThumbnail(Number(movieId)); 
-      this.onVideoClick(Number(movieId)); 
+      this.setActiveThumbnail(Number(movieId));
+      this.onVideoClick(Number(movieId));
     }
   }
 
@@ -96,6 +134,31 @@ export class VideoOfferComponent implements OnInit {
   }
 
   onVideoClick(videoId: number): void {
+    const isMobile = window.innerWidth < 600;
+    const videoPreview = document.querySelector(
+      '.video-preview'
+    ) as HTMLElement;
+    const videoContent = document.querySelector(
+      '.video-content'
+    ) as HTMLElement;
+
+    const videoOverlay = document.querySelector(
+      '.video-overlay'
+    ) as HTMLElement;
+
+    if (isMobile) {
+      // Auf Smartphones (<600px)
+      videoPreview?.setAttribute('style', 'display: unset;');
+      videoOverlay?.setAttribute('style', 'display: unset;');
+      videoContent?.classList.add('hidden');
+    } else {
+      // Auf Desktops (>=600px)
+
+      videoContent?.classList.remove('hidden');
+    }
+
+    // console.log(`Video ${videoId} angeklickt.`);
+
     const movie = this.videos
       .flatMap((video) => video.videos)
       .find((v) => v.id === videoId);

@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { HeaderComponent } from '../shared/header/header.component';
 import { AuthService } from '../services/auth.service';
-import { log } from 'console';
+// import { log } from 'console';
 import { RouterLink, RouterOutlet } from '@angular/router';
 
 @Component({
@@ -44,7 +44,8 @@ export class ActivateComponent {
         error: (err) => {
           console.error('Activation failed:', err);
           this.activationStatus = 'error';
-          this.message = 'Die Aktivierung ist fehlgeschlagen. Bitte versuchen Sie es erneut.';
+          this.message =
+            'Die Aktivierung ist fehlgeschlagen. Bitte versuchen Sie es erneut.';
         },
       });
     } else {
@@ -52,21 +53,4 @@ export class ActivateComponent {
       this.activationStatus = 'error';
     }
   }
-
-  // activateAccount(uid: string, token: string): void {
-  //   // Anfrage ans Backend senden
-  //   this.http
-  //     .post('http://localhost:8000/api/users/activate/', { uid, token })
-  //     .subscribe({
-  //       next: () => {
-  //         this.isSuccess = true;
-  //         this.message = 'Ihr Konto wurde erfolgreich aktiviert!';
-  //       },
-  //       error: () => {
-  //         this.isSuccess = false;
-  //         this.message =
-  //           'Die Aktivierung ist fehlgeschlagen. Bitte versuchen Sie es erneut.';
-  //       },
-  //     });
-  // }
 }

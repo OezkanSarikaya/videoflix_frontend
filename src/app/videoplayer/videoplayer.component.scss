@@ -70,7 +70,7 @@ input[type="range"]::-webkit-slider-thumb {
   right: 0;
   height: 100%;
   width: 100%;
-  opacity: 0;
+  opacity: 1;
   transition: 0.5s ease;
   display: flex;
   flex-direction: column;
@@ -220,3 +220,42 @@ border-radius: 8px;
   right: 10px;
 }
 
+
+@media only screen and (max-width: 740px) {
+  .max-width {
+      padding: 10px 16px;
+  }
+
+  .card {
+    padding: 43px 24px;
+  }
+
+  .video-preview, .video-overlay {display: none;}
+  .video-content {margin-top: 0;}
+}
+
+  @media screen and (orientation:landscape) {
+  // .max-width {
+  //     padding: 10px 16px;
+  // }
+
+  // .card {
+  //   padding: 43px 24px;
+  // }
+
+  // .video-preview, .video-overlay {display: none;}
+  // .video-content {margin-top: 0;}
+
+img {
+  width: 24px;
+  height: 24px;
+}
+
+.wrapper {
+// height:unset;
+
+
+}
+ 
+  
+}

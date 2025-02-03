@@ -13,7 +13,7 @@ export class ToastComponent {
   message: string = '';
   isVisible: boolean = false;
   showActionButton: boolean = false;
-  actionEmitter: EventEmitter<boolean> = new EventEmitter();
+  // actionEmitter: EventEmitter<boolean> = new EventEmitter();
 
   constructor(private toastService: ToastService) {}
 
@@ -29,20 +29,12 @@ export class ToastComponent {
   }
 
   closeToast() {
-    this.toastService.setResponse(false); 
+    this.toastService.setResponse(false);
     this.isVisible = false;
-    
   }
 
   onAction(response: boolean) {
-    // this.actionEmitter.emit(value);
-    // this.closeToast(); // Schließt den Toast nach der Aktion
-    // console.log(response);
-    // return response;
-    // this.closeToast();
     this.isVisible = false;
     this.toastService.setResponse(response); // Rückmeldung an den Service
-    // this.buttonClick.emit(response); // Falls weitere Verarbeitung nötig ist
   }
-
 }
