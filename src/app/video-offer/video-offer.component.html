@@ -41,12 +41,21 @@
         <div class="video-category" *ngIf="videosWithProgress.length > 0">
           <h3>Watchlist</h3>
           <div class="video-thumbnails">
-            <div *ngFor="let movie of videosWithProgress">
-              <!-- <img src="http://127.0.0.1:8000/{{ movie.thumbnail }}" alt="" (click)="onVideoClick(movie.id)"/> -->
+            <div *ngFor="let movie of videosWithProgress"  (click)="setActiveThumbnail(movie.id)" 
+            [class.active]="movie.id === activeThumbnailId" 
+            (keydown)="handleKeydown($event)"
+            (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)" 
+            (focusin)="setActiveThumbnail(movie.id); onVideoClick(movie.id)" 
+            >
+             
+       
               <img
                 src="{{ movie.thumbnail }}"
                 alt="{{ movie.title }}"
-                (click)="onVideoClick(movie.id)"
+            
+                tabindex="0"
+         
+                
               />
             </div>
           </div>

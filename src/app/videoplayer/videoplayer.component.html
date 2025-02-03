@@ -7,8 +7,6 @@
       (timeupdate)="updateSeekbar()"
     ></video>
 
-   
-
     <div class="overlay">
       <div class="topIcons">
         <div class="topLeftIcons">
@@ -19,7 +17,7 @@
           />
         </div>
         <div class="topMiddleText">
-          Optimizing video for your screen {{bufferedPercent.toFixed()}}% ({{
+          Optimizing video for your screen {{ bufferedPercent.toFixed() }}% / {{bufferedTime.toFixed()}} sek. ({{
             selectedResolution
           }})
         </div>
@@ -30,6 +28,14 @@
             routerLink="/"
           />
         </div>
+      </div>
+      <div class="middleVideoDescription" *ngIf="isVideoDescriptionVisible">
+        <h1>{{ videoData.title }}</h1>
+       
+        <p>
+          <small>{{ videoDuration }} Min.</small><br><br>
+          {{ videoData.description }}
+        </p>
       </div>
       <div class="bottom-controls">
         <div class="custom-controls">
@@ -83,7 +89,11 @@
           </div>
           <div class="middleTitle">{{ videoData.title }}</div>
           <div class="rightIcons">
-            <img src="../../assets/img/icons/subtitles.png" alt="" />
+            <img
+              src="../../assets/img/icons/subtitles.png"
+              alt=""
+              (click)="toogleVideoDescription()"
+            />
             <img
               src="../../assets/img/icons/speed.png"
               alt=""
@@ -119,7 +129,4 @@
       </div>
     </div>
   </div>
-
-
-
 </div>

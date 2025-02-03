@@ -80,6 +80,18 @@ input[type="range"]::-webkit-slider-thumb {
   }
 }
 
+.middleVideoDescription  {
+// background:red;
+margin: 40px;
+background: rgba(0, 0, 0, 0.4);
+border-radius: 8px;
+}
+
+.middleVideoDescription p, h1 {
+  margin:0 40px;
+  padding:20px;
+}
+
 .container:hover .overlay {
   opacity: 1;
 }

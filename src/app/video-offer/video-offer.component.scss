@@ -1,10 +1,16 @@
 
+body {
+  overflow-x: hidden;
+  margin: 0; /* Optional: Sicherheitsmaßnahme gegen unerwartete Abstände */
+}
+
 .black {
   background-color: black;
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
+
 }
 
 
@@ -12,9 +18,13 @@
   z-index: 2;
 }
 
+
 .video-category {
   display: flex;
   flex-direction: column;
+  gap: 8px;                /* Etwas Abstand zwischen Kategorie-Titel und Thumbnails */
+  max-width: 100%; /* Begrenzung auf die Breite des Viewports */
+  overflow: hidden; /* Verhindert, dass Inhalte über den Rand hinausragen */
 }
 
 .video-content {
@@ -114,7 +124,6 @@ h3 {
 
 .video-thumbnails {
   display: flex;
-  flex-wrap: wrap;
   gap: 16px;
   img {
     cursor: pointer;
@@ -126,4 +135,65 @@ h3 {
       border: 2px white solid;
     }
   }
+}
+
+
+.video-thumbnails {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; 
+  max-width: 100%; /* Begrenzung auf den Eltern-Container */
+  box-sizing: border-box; /* Sicherstellen, dass Padding/Border berücksichtigt werden */
+}
+
+.video-thumbnails::-webkit-scrollbar {
+  display: none;           /* Scrollbar in WebKit-Browsern (Chrome, Safari) ausblenden */
+}
+
+.video-thumbnails div {
+  scroll-snap-align: start; /* Optional: Snap-Effekt für jedes Thumbnail */
+   flex-shrink: 0; 
+}
+
+.video-thumbnails img {
+  cursor: pointer;
+  border: 2px transparent solid;
+  transition: border 225ms ease-in-out;
+  width: 213px;
+  height: 120px;
+  flex-shrink: 0; 
+  outline: none;
+}
+
+.video-thumbnails div.active img,
+.video-thumbnails img:focus {
+  border: 2px solid white; /* Weißer Rahmen für aktives oder fokussiertes Bild */
+}
+
+// .max-width {padding:0}
+
+.max-width {
+  box-sizing: border-box;
+  padding: 10px 96px;
+}
+
+
+@media only screen and (max-width: 600px) {
+  .max-width {
+      padding: 10px 16px;
+  }
+
+  .card {
+    padding: 43px 24px;
+  }
+
+  .video-preview, .video-overlay {display: none;}
+  .video-content {margin-top: 0;}
+
+
+ 
+  
 }

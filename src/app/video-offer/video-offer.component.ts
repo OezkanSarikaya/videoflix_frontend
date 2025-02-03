@@ -16,6 +16,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class VideoOfferComponent implements OnInit {
   videos: any[] = [];
+  activeThumbnailId: number | null = null;
   error: string | null = null;
   trailerId: number = 42; // autodetect this number!!!
   trailerTitle: string = 'Breakout';
@@ -44,6 +45,30 @@ export class VideoOfferComponent implements OnInit {
   ngOnInit(): void {
     this.loadVideos();
     this.loadVideosWithProgress();
+  }
+
+  setActiveThumbnail(id: number): void {
+    this.activeThumbnailId = id;
+  }
+  
+  handleKeydown(event: KeyboardEvent): void {
+    const currentThumbnail = event.target as HTMLElement;
+    const parentDiv = currentThumbnail.parentElement;
+  
+    let nextElement: HTMLElement | null = null;
+  
+    if (event.key === 'ArrowRight') {
+      nextElement = parentDiv?.nextElementSibling?.querySelector('img') as HTMLElement;
+    } else if (event.key === 'ArrowLeft') {
+      nextElement = parentDiv?.previousElementSibling?.querySelector('img') as HTMLElement;
+    }
+  
+    if (nextElement) {
+      nextElement.focus(); // Setzt den Fokus auf das nächste Thumbnail
+      const movieId = nextElement.getAttribute('data-movie-id');
+      this.setActiveThumbnail(Number(movieId)); 
+      this.onVideoClick(Number(movieId)); 
+    }
   }
 
   loadVideosWithProgress(): void {

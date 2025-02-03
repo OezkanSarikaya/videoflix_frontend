@@ -2,7 +2,6 @@ import {
   Component,
   ElementRef,
   ViewChild,
-  AfterViewChecked,
   AfterViewInit,
   OnInit,
   OnDestroy,
@@ -26,7 +25,6 @@ import { lastValueFrom } from 'rxjs';
 })
 export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   private onLoadedMetadata: (() => void) | null = null;
-  private isNetworkTestDone = false; // ✅ Flag für Netzwerktest
   apiUrl = environment.apiUrl;
   videoId: string | null = null;
   videoData: any = null;
@@ -39,12 +37,13 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   speedMbps: number = 0; // Netzwerkgeschwindigkeit in Mbit/s
   testCount: number = 0;
   resolution = '720p';
+  resolutions: string[] = ['120p', '360p', '720p', '1080p'];
   foundProgress: boolean | any = false;
   bufferedTime: number = 0;
   bufferedPercent: number = 0;
   isProgressChecked = false;
+  isVideoDescriptionVisible = false;
   hasDismissedProgressToast: boolean = false;
-  private maxTests: number = 5;
   private intervalId: any; // Referenz für das Interval
 
   @ViewChild('target', { static: false }) target!: ElementRef<HTMLVideoElement>;
@@ -62,8 +61,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     private videoService: VideoService,
     private progressService: VideoProgressService,
     private toastService: ToastService,
-    private cdr: ChangeDetectorRef,
-    private elementRef: ElementRef
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -89,12 +87,19 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   `;
   }
 
+  toogleVideoDescription(): void {
+    this.isVideoDescriptionVisible = !this.isVideoDescriptionVisible;
+
+    if (this.isResolutionPopupOpen) {
+      this.isResolutionPopupOpen = false;
+    }
+  }
+
   ngAfterViewInit(): void {
     this.route.paramMap.subscribe(async (params) => {
       this.videoId = params.get('videoId');
       if (this.videoId) {
         await this.loadVideoData(this.videoId); // Warten auf Daten
- 
 
         // SetTimeout, um sicherzugehen, dass Angular das Video-Element gerendert hat
         setTimeout(async () => {
@@ -106,19 +111,58 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
             // 🎯 Abgespielten Bereich flüssig updaten
             video.addEventListener('timeupdate', () => {
               this.currentTime = video.currentTime;
+              // this.bufferedTime = this.getBufferedTime();
+              // console.log(this.currentTime, this.bufferedTime);
+
+              const currentResolutionIndex = this.resolutions.indexOf(
+                this.resolution
+              );
+
+              if (this.bufferedTime < this.currentTime + 3) {
+                if (currentResolutionIndex - 1 >= 0) {
+                  console.log(
+                    'Auflösung verringert auf ' +
+                      this.resolutions[currentResolutionIndex - 1]
+                  );
+
+                  this.setResolution(
+                    this.resolutions[currentResolutionIndex - 1],
+                    this.currentTime
+                  );
+                  this.resolution =
+                    this.resolutions[currentResolutionIndex - 1];
+                  this.toastService.showToast(
+                    `Die Videoauflösung wurde automatisch auf ${this.resolution} optimiert!`,
+                    false
+                  );
+                }
+              }
+
+              // else {
+              //   if (currentResolutionIndex + 1 <= 3) {
+              //     this.setResolution(
+              //       this.resolutions[currentResolutionIndex + 1],
+              //       this.currentTime
+              //     );
+              //     this.resolution = this.resolutions[currentResolutionIndex - 1];
+              //     this.toastService.showToast(
+              //       `Die Videoauflösung wurde automatisch auf ${this.resolution} optimiert!`,
+              //       false
+              //     );
+              //   }
+
+              // }
+
               this.updateBufferedProgress();
             });
 
             video.addEventListener('progress', () => {
               this.bufferedTime = this.getBufferedTime();
+
               this.updateBufferedProgress();
             });
 
             video.addEventListener('loadedmetadata', async () => {
-              console.log('✅ Metadaten geladen!');
-              console.log('📌 Dauer des Videos:', video.duration);
-              // console.log('savedProgress: ' +savedProgress);
-
               // Jetzt ist die Dauer verfügbar
               this.videoDuration = this.formatTime(video.duration);
               this.seekbarValue = 0;
@@ -150,13 +194,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
                       console.error('Fehler bei Toast-Antwort:', err),
                   });
               }
-
-          
             });
-
-            // video.load(); // Lade das Video neu, falls nötig
-
-            // this.videoDuration = this.formatTime(video.duration);
           } else {
             console.error('❌ target ist immer noch undefined!');
           }
@@ -189,14 +227,30 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     if (this.target?.nativeElement) {
       const video = this.target.nativeElement;
 
-      // 🛑 Falls Video noch läuft → Pausieren
-      if (!video.paused) {
-        video.pause();
+      // 🛑 1️⃣ Video pausieren (falls noch aktiv)
+      video.pause();
+      video.currentTime = 0; // Zurücksetzen für sicheres Stoppen
+
+      // 🚫 2️⃣ Video-Quelle komplett entfernen
+      video.removeAttribute('src');
+      video.load(); // Erzwingt komplettes Entladen
+
+      // 🔊 3️⃣ Falls das Video einen aktiven Media-Stream hat, beenden
+      const mediaStream = video.srcObject as MediaStream;
+      if (mediaStream) {
+        mediaStream.getTracks().forEach((track) => track.stop()); // Alle Streams stoppen
+        video.srcObject = null;
       }
 
-      // 🚀 Video-Quelle entfernen, um das Laden komplett zu stoppen
-      video.src = '';
-      video.load(); // Browser zwingt ein Neuladen der Video-Elemente
+      // ⚡ 4️⃣ Event Listener entfernen, um sicherzugehen
+      video.onplay = null;
+      video.onpause = null;
+      video.onended = null;
+      video.ontimeupdate = null;
+      video.onloadedmetadata = null;
+
+      // 🗑️ 5️⃣ (Optional) Element aus DOM entfernen, falls nötig
+      video.parentNode?.removeChild(video);
     }
   }
 
@@ -231,7 +285,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
       if (this.resolution !== newResolution) {
         const video = this.target?.nativeElement;
-        const currentTime = video ? video.currentTime : 0;
+        this.currentTime = video ? video.currentTime : 0;
 
         this.resolution = newResolution;
         this.selectedResolution = newResolution;
@@ -355,7 +409,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   updateSeekbar(): void {
-    // console.log('updateSeekbar');
     if (this.target) {
       const video = this.target.nativeElement;
       this.seekbarValue = (video.currentTime / video.duration) * 100;
@@ -411,19 +464,20 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   toggleResolutionPopup(): void {
     this.isResolutionPopupOpen = !this.isResolutionPopupOpen;
+    this.isVideoDescriptionVisible = false;
   }
 
   userSelectedResolution(resolution: string): void {
-    // this.selectedResolution = 'auto';
     this.isUserSelectedResolution = true;
     this.setResolution(resolution);
   }
 
   setResolution(resolution: string, resumeTime: number = 0): void {
-    console.log('setResolution: ' + resumeTime);
+    // console.log('setResolution: ' + resumeTime);
 
     if (!this.target) return;
     this.selectedResolution = resolution;
+    // this.resolution = resolution;
 
     const video = this.target.nativeElement;
 

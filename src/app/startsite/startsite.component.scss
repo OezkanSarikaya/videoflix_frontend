@@ -44,11 +44,10 @@ input {
   border: 1px solid #ffffff;
   color: white;
   outline: unset;
-
   font-size: 18px;
   font-weight: 400;
   line-height: 23.44px;
-  // text-align: center;
+  box-sizing: border-box;
 }
 
 input::placeholder {
@@ -89,6 +88,6 @@ h2 {
     text-align: center;
   }
   .max-width {
-    padding: 10px 24px;
+    padding: 10px 16px;
   }
 }

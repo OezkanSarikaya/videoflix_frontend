@@ -76,3 +76,9 @@
     margin: 0;
   }
   
+  @media only screen and (max-width: 600px) {
+    .max-width {
+        padding: 10px 16px;
+    }
+
+  }
