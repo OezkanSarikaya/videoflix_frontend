@@ -8,10 +8,10 @@ import {
   ChangeDetectorRef,
 } from '@angular/core';
 import { RouterLink, RouterOutlet, ActivatedRoute } from '@angular/router';
-import { VideoService } from '../../app/services/videos/video.service';
-import { VideoProgressService } from '../../app/services/videos/video-progress.service';
+import { VideoService } from '../services/videos/video.service';
+import { VideoProgressService } from '../services/videos/video-progress.service';
 import { CommonModule } from '@angular/common';
-import { ToastService } from './../services/toast/toast.service';
+import { ToastService } from '../services/toast/toast.service';
 import { HeaderComponent } from '../shared/header/header.component';
 import { environment } from '../environment/environment';
 import { lastValueFrom } from 'rxjs';
@@ -36,6 +36,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   newFile: string = '';
   speedMbps: number = 0; // Netzwerkgeschwindigkeit in Mbit/s
   testCount: number = 0;
+  targetProgress: number = 0;
   resolution = '720p';
   resolutions: string[] = ['120p', '360p', '720p', '1080p'];
   foundProgress: boolean | any = false;
@@ -44,7 +45,9 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   isProgressChecked = false;
   isVideoDescriptionVisible = false;
   hasDismissedProgressToast: boolean = false;
+
   private intervalId: any; // Referenz für das Interval
+  private isDestroyed = false;
 
   @ViewChild('target', { static: false }) target!: ElementRef<HTMLVideoElement>;
   @ViewChild('seekbar') seekbar!: ElementRef<HTMLInputElement>;
@@ -79,12 +82,12 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     const playedPercent = (video.currentTime / video.duration) * 100;
 
     this.seekbar.nativeElement.style.background = `
-      linear-gradient(to right,
-        #fff ${playedPercent}%, /* Abgespielter Bereich */
-        #999 ${playedPercent}%, /* Geladener Bereich */
-        #999 ${this.bufferedPercent}%, /* Noch nicht geladener Bereich */
-        #666 ${this.bufferedPercent}%)
-  `;
+        linear-gradient(to right,
+          #fff ${playedPercent}%, /* Abgespielter Bereich */
+          #999 ${playedPercent}%, /* Geladener Bereich */
+          #999 ${this.bufferedPercent}%, /* Noch nicht geladener Bereich */
+          #666 ${this.bufferedPercent}%)
+    `;
   }
 
   toogleVideoDescription(): void {
@@ -94,6 +97,14 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       this.isResolutionPopupOpen = false;
     }
   }
+
+  // waitForLoadedMetadata(video: HTMLVideoElement): Promise<void> {
+  //   return new Promise((resolve) => {
+  //     video.addEventListener('loadedmetadata', () => {
+  //       resolve();
+  //     }, { once: true });
+  //   });
+  // }
 
   ngAfterViewInit(): void {
     this.route.paramMap.subscribe(async (params) => {
@@ -109,33 +120,53 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
             const video = this.target.nativeElement;
 
             // 🎯 Abgespielten Bereich flüssig updaten
-            video.addEventListener('timeupdate', () => {
+            video.addEventListener('timeupdate', async () => {
+              // if (
+              //   this.targetProgress &&
+              //   !this.isProgressChecked &&
+              //   video.readyState >= 2
+              // ) {
+              //   console.log('⏩ Versuche zu springen:', this.targetProgress);
+              //   video.currentTime = this.targetProgress;
+
+              //   video.addEventListener(
+              //     'seeked',
+              //     () => {
+              //       console.log('✅ Seek erfolgreich:', video.currentTime);
+              //     },
+              //     { once: true }
+              //   );
+
+              //   this.seekbarValue = this.targetProgress;
+              //   this.isProgressChecked = true; // Nur einmal ausführen
+              // }
+
               this.currentTime = video.currentTime;
-              // this.bufferedTime = this.getBufferedTime();
-              // console.log(this.currentTime, this.bufferedTime);
 
               const currentResolutionIndex = this.resolutions.indexOf(
                 this.resolution
               );
 
-              if (this.bufferedTime < this.currentTime + 3) {
-                if (currentResolutionIndex - 1 >= 0) {
-                  console.log(
-                    'Auflösung verringert auf ' +
-                      this.resolutions[currentResolutionIndex - 1]
-                  );
+              if (
+                this.bufferedTime < this.currentTime + 3 &&
+                this.currentTime + 3 < video.duration &&
+                currentResolutionIndex - 1 >= 0
+              ) {
+                console.log(
+                  'Auflösung verringert auf ' +
+                    this.resolutions[currentResolutionIndex - 1]
+                );
 
-                  this.setResolution(
-                    this.resolutions[currentResolutionIndex - 1],
-                    this.currentTime
-                  );
-                  this.resolution =
-                    this.resolutions[currentResolutionIndex - 1];
-                  this.toastService.showToast(
-                    `Die Videoauflösung wurde automatisch auf ${this.resolution} optimiert!`,
-                    false
-                  );
-                }
+                this.setResolution(
+                  this.resolutions[currentResolutionIndex - 1],
+                  this.currentTime
+                );
+
+                this.resolution = this.resolutions[currentResolutionIndex - 1];
+                this.toastService.showToast(
+                  `Die Videoauflösung wurde automatisch auf ${this.resolution} optimiert!`,
+                  false
+                );
               }
 
               // else {
@@ -154,25 +185,45 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
               // }
 
               this.updateBufferedProgress();
+
+              // console.log('⏱️ timeupdate:', video.currentTime);
             });
 
             video.addEventListener('progress', () => {
               this.bufferedTime = this.getBufferedTime();
-
               this.updateBufferedProgress();
             });
 
-            video.addEventListener('loadedmetadata', async () => {
-              // Jetzt ist die Dauer verfügbar
-              this.videoDuration = this.formatTime(video.duration);
-              this.seekbarValue = 0;
+            // [
+            //   'loadstart',
+            //   'loadedmetadata',
+            //   'timeupdate',
+            //   'seeking',
+            //   'seeked',
+            //   'pause',
+            //   'play',
+            //   'ended',
+            //   'ratechange',
+            // ].forEach((eventName) => {
+            //   video.addEventListener(eventName, (e) => {
+            //     console.log(
+            //       `📢 Event: ${eventName}, ⏱️ currentTime: ${video.currentTime}`
+            //     );
+            //   });
+            // });
 
+            video.addEventListener('loadedmetadata', async () => {
               const savedProgress = await this.checkVideoProgress(
                 this.videoId as string
               );
 
+              this.videoDuration = this.formatTime(video.duration);
+
+              this.seekbarValue = 0;
+
               if (savedProgress > 0 && !this.hasDismissedProgressToast) {
                 // 🟠 3. Benutzer fragen, ob er fortsetzen möchte
+
                 this.toastService
                   .showToast(
                     `Möchten Sie das Video bei ${savedProgress.toFixed(
@@ -183,11 +234,49 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
                   .subscribe({
                     next: (response: boolean) => {
                       if (response) {
-                        video.currentTime = savedProgress;
-                        this.seekbarValue = savedProgress;
+                        // this.targetProgress = savedProgress; // Zielzeit speichern
                         this.isProgressChecked = true;
+                        console.log(video.duration);
+
+                        setTimeout(() => {
+                          video.currentTime = savedProgress;
+                          console.log(
+                            '⏱️ currentTime gesetzt:',
+                            video.currentTime
+                          );
+
+                          // Warten auf das 'seeking' Event, um sicherzustellen, dass das Video die Zeit springt
+                          video.addEventListener('seeking', () => {
+                            console.log(
+                              '⏳ Video versucht zu springen zu:',
+                              video.currentTime
+                            );
+                          });
+
+                          // Warten auf das 'seeked' Event, um sicherzustellen, dass das Video den neuen Wert erreicht hat
+                          video.addEventListener('seeked', () => {
+                            console.log(
+                              '✅ Seek abgeschlossen bei:',
+                              video.currentTime
+                            );
+                            this.updateSeekbar();
+                          });
+                        }, 100); // Versuche
+
+                        // console.log(
+                        //   'currentTime: ',
+                        //   video.currentTime,
+                        //   savedProgress
+                        // );
+
+                        // console.log(
+                        //   'Toast bestätigt: ',
+                        //   this.targetProgress,
+                        //   this.isProgressChecked
+                        // );
                       } else {
                         this.hasDismissedProgressToast = true;
+                        this.isProgressChecked = true;
                       }
                     },
                     error: (err) =>
@@ -203,29 +292,48 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     });
 
     // Bildschirmgröße überwachen (aber keine neuen Netzwerk-Tests starten!)
-    this.resizeListener = () => {
-      this.cdr.detectChanges();
-      if (!this.isUserSelectedResolution) {
-        this.determineOptimalResolution();
-      }
-    };
-    window.addEventListener('resize', this.resizeListener);
+    if (!this.resizeListener) {
+      this.resizeListener = () => {
+        this.cdr.detectChanges();
+        if (!this.isUserSelectedResolution) {
+          this.determineOptimalResolution();
+        }
+      };
+      window.addEventListener('resize', this.resizeListener);
+    }
   }
 
   ngOnDestroy(): void {
+    this.isDestroyed = true;
     this.saveProgress();
+
     window.removeEventListener(
       'beforeunload',
       this.saveProgressBeforeUnload.bind(this)
     );
 
-    this.determineOptimalResolution();
+    if (this.target && this.target.nativeElement) {
+      const video = this.target.nativeElement;
+      video.pause(); // Stoppt das Video
+      video.currentTime = 0; // Setzt die Wiedergabe auf den Anfang
+      video.src = ''; // Entfernt die Videoquelle
+      video.load(); // Lädt das Video neu (ohne Quelle)
+    }
 
     window.removeEventListener('resize', this.resizeListener);
+    this.determineOptimalResolution();
     clearInterval(this.intervalId);
 
     if (this.target?.nativeElement) {
+      console.log('destroy!');
+
       const video = this.target.nativeElement;
+
+      if (video) {
+        video.pause(); // Stoppt das Video
+        video.currentTime = 0; // Setzt das Video zurück auf den Anfang
+        console.log('Video pausiert und zurückgesetzt');
+      }
 
       // 🛑 1️⃣ Video pausieren (falls noch aktiv)
       video.pause();
@@ -267,6 +375,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   determineOptimalResolution(): void {
+    if (this.isDestroyed) return;
     this.isUserSelectedResolution = false;
 
     setTimeout(() => {
@@ -515,8 +624,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
           } else {
             video.currentTime = currentTime;
           }
-          // video.play();
-          video.paused ? video.play() : video.pause();
+          video.play();
+          // video.paused ? video.play() : video.pause();
         }, 100);
       },
       { once: true }

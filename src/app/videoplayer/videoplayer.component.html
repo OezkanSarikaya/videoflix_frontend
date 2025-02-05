@@ -1,11 +1,19 @@
 <div class="wrapper">
   <div class="container" *ngIf="videoData">
-    <video
+    <!-- <video
       #target
       id="target"
       [src]="apiUrl + videoData.video_file"
       (timeupdate)="updateSeekbar()"
-    ></video>
+      (canplaythrough)="onCanPlayThrough()"
+    ></video> -->
+
+    <video
+    #target
+    id="target"
+    [src]="apiUrl + videoData?.video_file" 
+    (timeupdate)="updateSeekbar()"
+  ></video>
 
     <div class="overlay">
       <div class="topIcons">

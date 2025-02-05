@@ -1,22 +1,20 @@
-
 .wrapper {
   // background-color: black;
-  height:100vh;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
   background-image: linear-gradient(
-    180deg,
-    #000000 -19.89%,
-    rgba(0, 0, 0, 0.55) 40.46%,
-    #000000 100%
-  ),
-  url("../../assets/img/background/startsite.jpeg");
-background-repeat: no-repeat;
-background-size: cover;
-background-position: center center;
+      180deg,
+      #000000 -19.89%,
+      rgba(0, 0, 0, 0.55) 40.46%,
+      #000000 100%
+    ),
+    url("../../assets/img/background/startsite.jpeg");
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center center;
 }
-
 
 .container {
   position: relative;
@@ -37,7 +35,7 @@ video {
   justify-content: space-between;
   margin-top: 0px;
   padding: 0px 32px;
-  gap:12px;
+  gap: 12px;
 }
 
 input[type="range"] {
@@ -53,7 +51,7 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 12px;
   height: 12px;
-  background: #2E3EDF;
+  background: #2e3edf;
   border-radius: 50%;
 }
 
@@ -76,20 +74,21 @@ input[type="range"]::-webkit-slider-thumb {
   flex-direction: column;
   justify-content: space-between;
   img {
-    cursor: pointer;    
+    cursor: pointer;
   }
 }
 
-.middleVideoDescription  {
-// background:red;
-margin: 40px;
-background: rgba(0, 0, 0, 0.4);
-border-radius: 8px;
+.middleVideoDescription {
+  // background:red;
+  margin: 40px;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 8px;
 }
 
-.middleVideoDescription p, h1 {
-  margin:0 40px;
-  padding:20px;
+.middleVideoDescription p,
+h1 {
+  margin: 0 40px;
+  padding: 20px;
 }
 
 .container:hover .overlay {
@@ -124,7 +123,6 @@ border-radius: 8px;
 }
 
 .bottomIcons {
-
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -167,7 +165,7 @@ border-radius: 8px;
   position: absolute;
   bottom: 100px;
   right: 30px;
-  width:200px;
+  width: 200px;
   background: rgba(0, 0, 0, 0.6);
   color: white;
   border-radius: 8px;
@@ -220,42 +218,21 @@ border-radius: 8px;
   right: 10px;
 }
 
-
 @media only screen and (max-width: 740px) {
   .max-width {
-      padding: 10px 16px;
+    padding: 10px 16px;
   }
 
   .card {
     padding: 43px 24px;
   }
 
-  .video-preview, .video-overlay {display: none;}
-  .video-content {margin-top: 0;}
+  .video-preview,
+  .video-overlay {
+    display: none;
+  }
+  .video-content {
+    margin-top: 0;
+  }
 }
 
-  @media screen and (orientation:landscape) {
-  // .max-width {
-  //     padding: 10px 16px;
-  // }
-
-  // .card {
-  //   padding: 43px 24px;
-  // }
-
-  // .video-preview, .video-overlay {display: none;}
-  // .video-content {margin-top: 0;}
-
-img {
-  width: 24px;
-  height: 24px;
-}
-
-.wrapper {
-// height:unset;
-
-
-}
- 
-  
-}

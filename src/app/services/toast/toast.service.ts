@@ -18,7 +18,8 @@ export class ToastService {
   showToast(message: string, showButton: boolean): Observable<boolean> {
     if (this.toastComponent) {
       this.toastComponent.showToast(message, showButton);
-
+      
+      this.toastResponse = new Subject<boolean>();
       // Der ToastComponent ruft bei Button-Klick `setResponse` auf
       return this.toastResponse.asObservable();
     } else {
@@ -31,7 +32,11 @@ export class ToastService {
 
   // Diese Methode wird von der Toast-Komponente aufgerufen
   setResponse(response: boolean): void {
+    if (this.toastResponse) {
     this.toastResponse.next(response);
     this.toastResponse.complete(); // Schließt den Stream nach der Antwort
+    }
   }
+
+
 }

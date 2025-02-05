@@ -143,5 +143,13 @@
 
   .card {
     padding: 43px 24px;
+    form {
+      gap:16px;
+    }
+   
+    h2 {
+      font-size: 40px;
+      line-height: 46px;
+    }
   }
 }
