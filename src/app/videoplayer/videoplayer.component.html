@@ -1,19 +1,11 @@
 <div class="wrapper">
-  <div class="container" *ngIf="videoData">
-    <!-- <video
+  <div id="container" class="container" #container *ngIf="videoData && !showRotateMessage">
+    <video
       #target
       id="target"
-      [src]="apiUrl + videoData.video_file"
+      [src]="apiUrl + videoData?.video_file"
       (timeupdate)="updateSeekbar()"
-      (canplaythrough)="onCanPlayThrough()"
-    ></video> -->
-
-    <video
-    #target
-    id="target"
-    [src]="apiUrl + videoData?.video_file" 
-    (timeupdate)="updateSeekbar()"
-  ></video>
+    ></video>
 
     <div class="overlay">
       <div class="topIcons">
@@ -25,26 +17,77 @@
           />
         </div>
         <div class="topMiddleText">
-          Optimizing video for your screen {{ bufferedPercent.toFixed() }}% / {{bufferedTime.toFixed()}} sek. ({{
-            selectedResolution
-          }})
+          Optimizing video for your screen {{ bufferedPercent.toFixed() }}% /
+          {{ bufferedTime.toFixed() }} sek. ({{ selectedResolution }})
         </div>
+        
         <div class="topRightIcons">
           <img
             src="../../assets/img/icons/logo-icon.png"
             alt=""
-            routerLink="/"
+            routerLink="/videos/"
           />
         </div>
       </div>
+
+
+
+      <div class="mobileTopIcons">
+        <div class="topLeftIcons">
+
+          <img
+          src="../../assets/img/icons/logo-icon.png"
+          alt=""
+          routerLink="/videos/"
+        />
+        {{ videoData.title }}
+        </div>
+    
+        
+        <div class="topRightIcons">
+          <img
+          src="../../assets/img/icons/close_small.png"
+          alt=""
+          routerLink="/videos/"
+        />
+        </div>
+      </div>
+
       <div class="middleVideoDescription" *ngIf="isVideoDescriptionVisible">
         <h1>{{ videoData.title }}</h1>
-       
+
         <p>
-          <small>{{ videoDuration }} Min.</small><br><br>
+          <small>{{ videoDuration }} Min.</small><br /><br />
           {{ videoData.description }}
         </p>
       </div>
+
+      <div class="mobileVideoControls">
+       
+      <img
+        src="../../assets/img/icons/replay_10.png"
+        alt=""
+        (click)="rewind(10)"
+      />
+      <img
+      *ngIf="target.paused"
+      src="../../assets/img/icons/play_arrow.png"
+      alt=""
+      (click)="toggleVideo()"
+    />
+    <img
+      *ngIf="!target.paused"
+      src="../../assets/img/icons/pause.png"
+      alt=""
+      (click)="toggleVideo()"
+    />
+      <img
+        src="../../assets/img/icons/forward_10.png"
+        alt=""
+        (click)="forward(10)"
+      />
+      </div>
+
       <div class="bottom-controls">
         <div class="custom-controls">
           <input
@@ -58,6 +101,18 @@
             >{{ formatTime(currentTime) }} / {{ videoDuration }}</span
           >
         </div>
+
+
+        <div class="mobileBottomIcons">
+  
+          <img
+            src="../../assets/img/icons/speed.png"
+            alt=""
+            (click)="toggleResolutionPopup()"
+          /> Speed
+
+        </div>
+
         <div class="bottomIcons">
           <div class="leftIcons">
             <img
@@ -137,4 +192,13 @@
       </div>
     </div>
   </div>
+
+
+
+  <div *ngIf="showRotateMessage" class="rotate-message">
+    📱 Bitte drehen Sie Ihr Gerät in den Landscape-Modus, um das Video zu sehen.
+  </div>
+
+
+
 </div>

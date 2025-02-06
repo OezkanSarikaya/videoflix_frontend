@@ -16,11 +16,22 @@
   background-position: center center;
 }
 
+.mobileTopIcons {
+  display: none;
+}
+
+.topLeftIcons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .container {
   position: relative;
   // width: 100%;
   width: 1200px;
   background-color: black;
+  display: flex;
 }
 
 video {
@@ -58,6 +69,10 @@ input[type="range"]::-webkit-slider-thumb {
 .video-duration {
   font-size: 14px;
   color: white;
+}
+
+.mobileVideoControls {
+  display: none;
 }
 
 .overlay {
@@ -142,8 +157,10 @@ h1 {
   align-items: center;
   gap: 24px;
   img {
-    width: 48px;
-    height: 48px;
+    max-width: 48px;
+    max-height: 48px;
+    width: 100%;
+    height: 100%;
   }
 }
 
@@ -218,6 +235,19 @@ h1 {
   right: 10px;
 }
 
+.mobileBottomIcons {
+  display: none;
+}
+
+.rotate-message {
+  text-align: center;
+  font-size: 18px;
+  padding: 20px;
+  background: #2e3edf;
+  border-radius: 10px;
+  margin: 20px;
+}
+
 @media only screen and (max-width: 740px) {
   .max-width {
     padding: 10px 16px;
@@ -234,5 +264,91 @@ h1 {
   .video-content {
     margin-top: 0;
   }
-}
 
+  .leftIcons,
+  .rightIcons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    img {
+      max-width: 32px;
+      max-height: 32px;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .middleTitle {
+    font-size: 20px;
+    font-weight: 500;
+    line-height: 26.04px;
+  }
+
+  // .middleVideoDescription {
+  //   opacity: 0;
+  // }
+
+  .mobileVideoControls {
+    display: flex;
+    justify-content: space-evenly;
+    img {
+      max-width: 48px;
+      max-height: 48px;
+      width: 100%;
+      height: 100%;
+    }
+  }
+
+  .topIcons {
+    display: none;
+  }
+
+  .bottomIcons {
+    display: none;
+  }
+
+  .mobileBottomIcons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0) 0%,
+      rgba(0, 0, 0, 0.6) 100%
+    );
+    padding: 10px 32px;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 15.62px;
+    text-align: left;
+ 
+  
+
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
+
+  .mobileTopIcons {
+    max-height: 80px;
+    box-sizing: border-box;
+    height: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(
+      180deg,
+      rgba(0, 0, 0, 0.7) 0%,
+      rgba(0, 0, 0, 0) 100%
+    );
+    padding: 10px 16px 10px 32px;
+    gap: 16px;
+    img {
+      width: 32px;
+      height: 32px;
+    }
+  }
+}
