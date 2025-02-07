@@ -25,8 +25,12 @@
           <p>
             {{ trailerDescription }}
           </p>
-          <div>
+          <div class="preview-buttons">
             <button routerLink="/videoplayer/{{ trailerId }}">Play</button>
+
+            <button class="closeMobileTrailerButton" (click)="this.closeMobileTrailer()">
+              <img src="../../assets/img/icons/arrow_back.png" alt="">
+              Back </button>
           </div>
         </div>
       </div>

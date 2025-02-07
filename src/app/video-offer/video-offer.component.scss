@@ -76,6 +76,10 @@ app-header {
   justify-content: space-between;
 }
 
+.closeMobileTrailerButton {
+  display: none;
+}
+
 .video-info-preview {
   box-sizing: border-box;
   max-width: 540px;
@@ -84,8 +88,14 @@ app-header {
   flex-direction: column;
   gap: 32px;
   background-color: rgba(0, 0, 0, 0.3);
-  border-radius: 20px;
+  // border-radius: 20px;
   padding: 20px;
+  .preview-buttons {
+    display: flex;
+    gap: 16px;
+    border-radius: 20px;
+    box-sizing: border-box;
+  }
   p {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -184,6 +194,10 @@ h3 {
 }
 
 @media only screen and (max-width: 600px) {
+
+  .closeMobileTrailerButton {
+    display: block;
+  }
   .max-width {
     padding: 10px 16px;
   }
@@ -195,11 +209,10 @@ h3 {
   .video-preview,
   .video-overlay {
     display: none;
-   
   }
 
   .video-info-preview {
-    padding:0;
+    padding: 0;
   }
   .video-content {
     margin-top: 0;
@@ -208,5 +221,21 @@ h3 {
   h1 {
     font-size: 64px;
     line-height: 64px;
+  }
+  .preview-buttons {
+    display: flex;
+    // align-items: center;
+    gap: 16px;
+    border-radius: 20px;
+    box-sizing: border-box;
+    button {
+      display: flex;
+      align-items: center;
+      gap:8px;
+    }
+    img {
+      width:24px;
+      height:24px;
+    }
   }
 }

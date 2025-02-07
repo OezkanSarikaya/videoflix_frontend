@@ -70,6 +70,23 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
     }
   };
 
+  closeMobileTrailer(): void {
+    const isMobile = window.innerWidth < 600;
+    const videoPreview = document.querySelector(
+      '.video-preview'
+    ) as HTMLElement;
+    const videoContent = document.querySelector(
+      '.video-content'
+    ) as HTMLElement;
+    const videoOverlay = document.querySelector(
+      '.video-overlay'
+    ) as HTMLElement;
+
+    videoContent?.classList.remove('hidden');
+    videoPreview?.setAttribute('style', 'display: hidden;');
+    videoOverlay?.setAttribute('style', 'display: hidden;');
+  }
+
   openVideoPlayer(videoId: string): void {
     // Navigiere zur Video-Player-Seite und übergebe die Video-ID
     this.router.navigate(['/videoplayer/', videoId]);
