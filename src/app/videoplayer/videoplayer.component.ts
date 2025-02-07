@@ -127,7 +127,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   ngAfterViewInit(): void {
     // this.checkScreenOrientation();
-    console.log('playerContainerRef:', this.playerContainerRef); 
+
 
     this.route.paramMap.subscribe(async (params) => {
       this.videoId = params.get('videoId');
