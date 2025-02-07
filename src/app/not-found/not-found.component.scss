@@ -1,0 +1,151 @@
+.not-found-container {
+    text-align: center;
+    margin-top: 50px;
+    
+    h2 {
+      font-size: 3rem;
+      color: red;
+    }
+  
+    p {
+      font-size: 1.5rem;
+      margin: 10px 0;
+    }
+  
+    a {
+      font-size: 1.2rem;
+      color: blue;
+      text-decoration: underline;
+    }
+  }
+
+  .startsite {
+    height: 100dvh;
+    background-image: linear-gradient(
+        180deg,
+        #000000 -19.89%,
+        rgba(0, 0, 0, 0.55) 40.46%,
+        #000000 100%
+      ),
+      url("../../assets/img/background/startsite.jpeg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center center;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .vertical-center {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 32px;
+    form {
+      display: flex;
+      justify-content: space-between;
+      flex-direction: row;
+      align-items: center;
+      gap: 16px;
+    }
+  }
+  
+  input {
+    max-width: 360px;
+    width:100%;
+    background-color: transparent !important;
+    padding: 12px 24px;
+    gap: 10px;
+    border-radius: 40px;
+    border: 1px solid #ffffff;
+    color: white;
+    outline: unset;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23.44px;
+    box-sizing: border-box;
+  }
+  
+  input::placeholder {
+    max-width: 360px;
+    color: white;
+    font-family: DM Sans;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23.44px;
+    text-align: left;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+  }
+  
+  p {
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 23.44px;
+    text-align: center;
+    text-underline-position: from-font;
+    text-decoration-skip-ink: none;
+    margin: 0;
+  }
+  
+  h2 {
+    font-size: 48px;
+    font-weight: 700;
+    line-height: 62.5px;
+    text-align: left;
+    margin: 0;
+  }
+  .card {
+    max-width: 520px;
+    width: 100%;
+    padding: 43px 56px;
+    gap: 32px;
+    border-radius: 48px;
+    background-color: white;
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    gap: 32px;
+    box-sizing: border-box;
+    color:black;
+    align-items: center;
+  }
+
+  button {
+    
+    width: fit-content;
+  }
+  
+  @media only screen and (max-width: 600px) {
+    .content {
+      justify-content: center;
+    }
+    h2 {
+      text-align: center;
+    }
+    .max-width {
+      padding: 10px 16px;
+    }
+    .card {
+        padding: 43px 24px;
+        form {
+          gap:16px;
+        }
+       
+        h2 {
+          font-size: 40px;
+          line-height: 46px;
+        }
+      }
+  }
+
+
+
+
+  
+  

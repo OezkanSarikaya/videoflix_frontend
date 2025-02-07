@@ -5,6 +5,7 @@ import { HeaderComponent } from "../shared/header/header.component";
 import { FooterComponent } from "../shared/footer/footer.component";
 import { FormsModule, NgForm } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
+import { ToastService } from './../services/toast/toast.service';
 // import { NgModule } from '@angular/core';
 
 @Component({
@@ -22,7 +23,7 @@ export class SignupComponent implements OnInit {
   errorMessage: string = '';
   showSuccessMessage: boolean = false;
 
-  constructor(private authService: AuthService, private route: ActivatedRoute) {}
+  constructor(private authService: AuthService, private route: ActivatedRoute, private toastService: ToastService) {}
 
   ngOnInit() {
     // E-Mail aus Query-Params übernehmen, falls vorhanden
@@ -51,9 +52,13 @@ export class SignupComponent implements OnInit {
         // Handle successful signup (e.g., redirect to login page or dashboard)
       },
       (error) => {
-        console.error('Signup failed', error);
+        // console.error('Signup failed', error);
         this.errorMessage = "Signup failed, please try again.";
         this.showSuccessMessage = false; // Erfolgsmeldung zurücksetzen
+        this.toastService.showToast(
+          this.errorMessage,
+          false
+        );
       }
     );
   }

@@ -3,7 +3,6 @@
     <app-header></app-header>
     <div class="card">
       <h2>Log in</h2>
-      <!-- <form (ngSubmit)="login(loginForm)" #loginForm="ngForm"> -->
       <form (ngSubmit)="login()" #loginForm="ngForm">
         <div>
         <input
@@ -44,8 +43,7 @@
           />
         </div>
         <label><input type="checkbox" name="rememberme" [(ngModel)]="rememberme" /> Remember me</label>
-        <div class="horizontal-center">
-          <!-- <button type="submit">Log in</button> -->
+        <div class="horizontal-center">   
 
           @if (loginForm.valid ) {
             <button type="submit">Log in</button>

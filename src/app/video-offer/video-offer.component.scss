@@ -195,6 +195,14 @@ h3 {
 
 @media only screen and (max-width: 600px) {
 
+  .video-thumbnails img {
+    box-sizing: border-box;
+    width: 170px;
+    height: 96px;
+    object-fit: contain;
+
+  }
+
   .closeMobileTrailerButton {
     display: block;
   }
@@ -216,6 +224,7 @@ h3 {
   }
   .video-content {
     margin-top: 0;
+    gap:32px;
   }
 
   h1 {
