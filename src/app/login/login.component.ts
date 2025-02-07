@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { HeaderComponent } from '../shared/header/header.component';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
-import { FormsModule, NgForm } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
 import { ToastService } from './../services/toast/toast.service';
 
 @Component({
@@ -15,7 +15,6 @@ import { ToastService } from './../services/toast/toast.service';
     FooterComponent,
     HeaderComponent,
     RouterLink,
-    RouterOutlet,
     FormsModule,
     CommonModule,
   ],

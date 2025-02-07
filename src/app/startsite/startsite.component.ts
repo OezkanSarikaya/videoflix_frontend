@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { HeaderComponent } from '../shared/header/header.component';
-import { RouterLink, Router , RouterOutlet } from '@angular/router';
+import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ToastService } from './../services/toast/toast.service';
@@ -9,7 +9,7 @@ import { ToastService } from './../services/toast/toast.service';
 @Component({
   selector: 'app-startsite',
   standalone: true,
-  imports: [FooterComponent, HeaderComponent, RouterLink, FormsModule, CommonModule],
+  imports: [FooterComponent, HeaderComponent, FormsModule, CommonModule],
   templateUrl: './startsite.component.html',
   styleUrl: './startsite.component.scss'
 })

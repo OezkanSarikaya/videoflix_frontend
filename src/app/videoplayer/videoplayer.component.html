@@ -149,6 +149,13 @@
               alt=""
               (click)="toggleMute()"
             />
+            <input
+            type="range"
+            [(ngModel)]="volume" 
+            (input)="updateVolume(target)"
+            step="0.1" min="0" max="1"
+          />
+
           </div>
           <div class="middleTitle">{{ videoData.title }}</div>
           <div class="rightIcons">

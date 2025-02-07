@@ -6,8 +6,6 @@ import {
   OnInit,
   OnDestroy,
   ChangeDetectorRef,
-  HostListener,
-  AfterViewChecked
 } from '@angular/core';
 import { RouterLink, RouterOutlet, ActivatedRoute } from '@angular/router';
 import { VideoService } from '../services/videos/video.service';
@@ -17,16 +15,18 @@ import { ToastService } from '../services/toast/toast.service';
 import { HeaderComponent } from '../shared/header/header.component';
 import { environment } from '../environment/environment';
 import { lastValueFrom } from 'rxjs';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-videoplayer',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, HeaderComponent],
+  imports: [CommonModule, RouterOutlet, RouterLink, HeaderComponent, FormsModule],
   templateUrl: './videoplayer.component.html',
   styleUrls: ['./videoplayer.component.scss'],
 })
 export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   private onLoadedMetadata: (() => void) | null = null;
+  volume: number = 0.5; // Standardlautstärke auf 50%
   apiUrl = environment.apiUrl;
   videoId: string | null = null;
   videoData: any = null;
@@ -78,12 +78,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     );
   }
 
-  // ngAfterViewChecked() {
-  //   if (!this.showRotateMessage && this.playerContainerRef) {
-  //     // Referenz ist wieder verfügbar, Fullscreen aktivieren
-  //     this.toggleFullscreen();
-  //   }
-  // }
 
   updateBufferedProgress(): void {
     if (!this.seekbar || !this.target) return;
@@ -109,20 +103,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  // waitForLoadedMetadata(video: HTMLVideoElement): Promise<void> {
-  //   return new Promise((resolve) => {
-  //     video.addEventListener('loadedmetadata', () => {
-  //       resolve();
-  //     }, { once: true });
-  //   });
-  // }
-
-  // ngAfterViewChecked() {
-  //   if (!this.showRotateMessage && !this.playerContainerRef) {
-  //     // ViewChild erneut abrufen
-  //     this.playerContainerRef = this.containerRef;
-  //   }
-  // }
   
 
   ngAfterViewInit(): void {
@@ -224,10 +204,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
                           // Warten auf das 'seeked' Event, um sicherzustellen, dass das Video den neuen Wert erreicht hat
                           video.addEventListener('seeked', () => {
-                            // console.log(
-                            //   '✅ Seek abgeschlossen bei:',
-                            //   video.currentTime
-                            // );
+                  
                             this.updateSeekbar();
                           });
                         }, 100); // Versuche
@@ -263,8 +240,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     // this.checkScreenOrientation();
   }
 
-  // @HostListener('window:resize')
-  // @HostListener('window:orientationchange')
   checkScreenOrientation() {
     const isPortrait = window.matchMedia('(orientation: portrait)').matches;
     const isSmallScreen = window.innerWidth < 768;
@@ -520,6 +495,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isResolutionPopupOpen = false;
   }
 
+
+
   rewind(seconds: number): void {
     if (this.target) {
       // console.log('rewind' +this.target);
@@ -556,6 +533,17 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       video.currentTime = seekTo;
       this.currentTime = video.currentTime;
       this.videoDuration = this.formatTime(video.duration);
+    }
+  }
+
+
+  updateVolume(target: HTMLVideoElement): void {
+    target.volume = this.volume; // Setze die Lautstärke des Video-Players
+    if (this.volume == 0) {
+      this.isMuted = true;
+    }
+    else {
+      this.isMuted = false;
     }
   }
 
@@ -609,6 +597,12 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     const video = this.target.nativeElement;
     video.muted = !video.muted;
     this.isMuted = video.muted;
+    if (video.muted) {
+      this.volume = 0;
+    }
+    else {
+      this.volume = 0.5;
+    }
   }
 
   toggleResolutionPopup(): void {
