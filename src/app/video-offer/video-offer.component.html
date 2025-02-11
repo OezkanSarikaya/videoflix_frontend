@@ -41,7 +41,7 @@
           <div class="video-thumbnails">
             <div
               *ngFor="let movie of videosWithProgress"
-              (click)="setActiveThumbnail(movie.id)"
+              
               [class.active]="movie.id === activeThumbnailId"
               (keydown)="handleKeydown($event)"
               (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"

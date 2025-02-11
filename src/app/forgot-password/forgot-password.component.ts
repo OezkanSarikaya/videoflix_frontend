@@ -15,16 +15,19 @@ import { CommonModule } from '@angular/common';
 export class ForgotPasswordComponent {
   email: string = '';
   statusMessage: string = '';
+  hideForm: boolean = false;
 
   constructor(private authService: AuthService) {}
 
   onSubmit(): void {
     this.authService.forgotPassword(this.email).subscribe({
       next: () => {
-        this.statusMessage = 'Reset link sent! Check your email.';
+        this.statusMessage = 'Reset link sent! Please, check your email.';
+        this.hideForm = true;
       },
       error: () => {
         this.statusMessage = 'Something went wrong. Please try again.';
+        this.hideForm = false;
       },
     });
   }
