@@ -20,7 +20,13 @@ import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-videoplayer',
   standalone: true,
-  imports: [CommonModule, RouterOutlet, RouterLink, HeaderComponent, FormsModule],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    RouterLink,
+    HeaderComponent,
+    FormsModule,
+  ],
   templateUrl: './videoplayer.component.html',
   styleUrls: ['./videoplayer.component.scss'],
 })
@@ -54,7 +60,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   @ViewChild('target', { static: false }) target!: ElementRef<HTMLVideoElement>;
   @ViewChild('seekbar') seekbar!: ElementRef<HTMLInputElement>;
-  @ViewChild('container', { static: false }) playerContainerRef!: ElementRef<HTMLDivElement>;
+  @ViewChild('container', { static: false })
+  playerContainerRef!: ElementRef<HTMLDivElement>;
   videoLoaded = false;
 
   seekbarValue: number = 0;
@@ -77,7 +84,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
       this.saveProgressBeforeUnload.bind(this)
     );
   }
-
 
   updateBufferedProgress(): void {
     if (!this.seekbar || !this.target) return;
@@ -103,11 +109,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  
-
   ngAfterViewInit(): void {
     // this.checkScreenOrientation();
-
 
     this.route.paramMap.subscribe(async (params) => {
       this.videoId = params.get('videoId');
@@ -131,13 +134,13 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
               if (
                 this.bufferedTime < this.currentTime + 3 &&
                 this.currentTime + 3 < video.duration &&
-                currentResolutionIndex - 1 >= 0 && 
-                !this.isUserSelectedResolution 
+                currentResolutionIndex - 1 >= 0 &&
+                !this.isUserSelectedResolution
               ) {
-                console.log(
-                  'Auflösung verringert auf ' +
-                    this.resolutions[currentResolutionIndex - 1]
-                );
+                // console.log(
+                //   'Auflösung verringert auf ' +
+                //     this.resolutions[currentResolutionIndex - 1]
+                // );
 
                 this.setResolution(
                   this.resolutions[currentResolutionIndex - 1],
@@ -204,7 +207,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
                           // Warten auf das 'seeked' Event, um sicherzustellen, dass das Video den neuen Wert erreicht hat
                           video.addEventListener('seeked', () => {
-                  
                             this.updateSeekbar();
                           });
                         }, 100); // Versuche
@@ -233,7 +235,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
           this.determineOptimalResolution();
           // this.checkScreenOrientation();
         }
-        
       };
       window.addEventListener('resize', this.resizeListener);
     }
@@ -257,10 +258,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
         // console.log('🔍 Kein Fullscreen aktiv:');
         document.exitFullscreen?.();
       }
-
     }
-
-  
 
     // if (isSmallScreen && isPortrait) {
     //   // 📱 Portrait + kleine Breite → Meldung anzeigen
@@ -270,15 +268,14 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     // } else if (isSmallScreen ) {
     //   this.showRotateMessage = false;
     //   this.cdr.detectChanges();
-    //   // 📱 Landscape + kleine Breite → Fullscreen aktivieren      
+    //   // 📱 Landscape + kleine Breite → Fullscreen aktivieren
     //   console.log('Vollbildmodus aktivieren!', isSmallScreen, isPortrait);
     //   setTimeout(() => {
     //     this.toggleFullscreen();
     //   }, 100);
-      
+
     //   // this.toggleFullscreen();
     //   // console.log(this.playerContainerRef.nativeElement);
-       
 
     // } else {
     //   // 🖥️ Größere Screens → Keine Einschränkungen
@@ -370,11 +367,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   determineOptimalResolution(): void {
     // this.checkScreenOrientation();
 
-
     if (this.isDestroyed) return;
     this.isUserSelectedResolution = false;
-
-   
 
     setTimeout(() => {
       const screenWidth = window.innerWidth;
@@ -390,7 +384,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
         newResolution = '120p';
       }
 
-
       if (this.resolution !== newResolution) {
         const video = this.target?.nativeElement;
         this.currentTime = video ? video.currentTime : 0;
@@ -398,14 +391,11 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.resolution = newResolution;
         this.selectedResolution = newResolution;
 
-  
-
         this.toastService.showToast(
           `Die Videoauflösung wurde automatisch auf ${this.resolution} optimiert!`,
           false
         );
         this.cdr.detectChanges();
-
 
         this.setResolution(this.resolution, this.currentTime);
       }
@@ -481,7 +471,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.progressService
           .saveProgress(parseInt(this.videoId), progress)
           .subscribe(
-            () => console.log('Progress saved successfully'),
+            () => {}, 
+            // () => console.log('Progress saved successfully'),
             (error) => console.error('Error saving progress:', error)
           );
       }
@@ -494,8 +485,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     video.paused ? video.play() : video.pause();
     this.isResolutionPopupOpen = false;
   }
-
-
 
   rewind(seconds: number): void {
     if (this.target) {
@@ -536,13 +525,13 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-
   updateVolume(target: HTMLVideoElement): void {
     target.volume = this.volume; // Setze die Lautstärke des Video-Players
     if (this.volume == 0) {
       this.isMuted = true;
-    }
-    else {
+    } else {
+      const video = this.target.nativeElement;
+      video.muted = false;
       this.isMuted = false;
     }
   }
@@ -564,23 +553,21 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   toggleFullscreen(): void {
-    console.log('fullscreen aktivieren');
+    // console.log('fullscreen aktivieren');
     // if (!this.playerContainerRef || !this.playerContainerRef.nativeElement) return;
     const playerContainer = this.playerContainerRef.nativeElement;
     // const video = this.target.nativeElement;
 
     if (!document.fullscreenElement) {
-      console.log('📏 Fullscreen aktiv');
+      // console.log('📏 Fullscreen aktiv');
       // video.requestFullscreen?.();
       // this.playerContainerRef.nativeElement.requestFullscreen?.();
       playerContainer.requestFullscreen?.();
     } else {
-      console.log('🔍 Kein Fullscreen aktiv:');
+      // console.log('🔍 Kein Fullscreen aktiv:');
       document.exitFullscreen?.();
     }
   }
-
-
 
   // enterFullscreen() {
   //   const playerContainer = this.playerContainerRef.nativeElement;
@@ -591,7 +578,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   //   }
   // }
 
-
   toggleMute(): void {
     if (!this.target || !this.target.nativeElement) return;
     const video = this.target.nativeElement;
@@ -599,8 +585,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     this.isMuted = video.muted;
     if (video.muted) {
       this.volume = 0;
-    }
-    else {
+    } else {
       this.volume = 0.5;
     }
   }

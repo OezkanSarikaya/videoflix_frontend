@@ -20,7 +20,8 @@ export class VideoService {
   }
 
   getVideos(): Observable<any> {
-    return this.http.get(this.apiUrl + 'api/genres/videos/', {
+    // return this.http.get(this.apiUrl + 'api/genres/videos/', {
+      return this.http.get(`${this.apiUrl}api/genres/videos/`, {
       headers: this.authService.getAuthHeaders(),
     });
   }

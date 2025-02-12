@@ -26,7 +26,7 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
   apiUrl = environment.apiUrl;
   activeThumbnailId: number | null = null;
   error: string | null = null;
-  trailerId: number = 42; // autodetect this number!!!
+  trailerId: number = 18; // autodetect this number!!!
   trailerTitle: string = 'Breakout';
   trailerDescription: string =
     'In a high-security prison, a wrongly convicted man formulates a meticulous plan to break out and prove his innocence. He must navigate a web of alliances and betrayals to reclaim his freedom and expose the truth.';
