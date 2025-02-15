@@ -28,27 +28,31 @@
           <div class="preview-buttons">
             <button routerLink="/videoplayer/{{ trailerId }}">Play</button>
 
-            <button class="closeMobileTrailerButton" (click)="this.closeMobileTrailer()">
-              <img src="../../assets/img/icons/arrow_back.png" alt="">
-              Back </button>
+            <button
+              class="closeMobileTrailerButton"
+              (click)="this.closeMobileTrailer()"
+            >
+              <img src="../../assets/img/icons/arrow_back.png" alt="" />
+              Back
+            </button>
           </div>
         </div>
       </div>
 
       <div class="video-content">
+        
         <div class="video-category" *ngIf="videosWithProgress.length > 0">
           <h3>Watchlist</h3>
           <div class="video-thumbnails">
             <div
               *ngFor="let movie of videosWithProgress"
-              
               [class.active]="movie.id === activeThumbnailId"
               (keydown)="handleKeydown($event)"
               (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
               (focusin)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
             >
               <img
-                src="{{ movie.thumbnail }}"
+                [src]="movie.thumbnailUrl"
                 alt="{{ movie.title }}"
                 tabindex="0"
               />
@@ -59,19 +63,19 @@
         <div class="video-category" *ngFor="let video of videos">
           <h3>{{ video.title }}</h3>
           <div class="video-thumbnails">
-            <div *ngFor="let movie of video.videos"
-            (click)="setActiveThumbnail(movie.id)"
-            [class.active]="movie.id === activeThumbnailId"
-            (keydown)="handleKeydown($event)"
-            (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
-            (focusin)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
-            
+            <div
+              *ngFor="let movie of video.videos"
+              [class.active]="movie.id === activeThumbnailId"
+              (keydown)="handleKeydown($event)"
+              (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
+              (focusin)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
             >
+              <p>Thumbnail URL: {{ movie.thumbnailUrl || 'Fehler beim Laden' }}</p>
               <img
-                src="{{ this.apiUrl }}{{ movie.thumbnail }}"
+                *ngIf="movie.thumbnailUrl"
+                [src]="movie.thumbnailUrl"
                 alt="{{ movie.title }}"
                 tabindex="0"
-       
               />
             </div>
           </div>

@@ -31,4 +31,13 @@ export class VideoService {
       headers: this.authService.getAuthHeaders(),
     });
   }
+
+
+  getThumbnailUrl(thumbnailPath: string): Observable<Blob> {
+    const headers = this.authService.getAuthHeaders(); // Holt den Bearer-Token
+    return this.http.get(`${this.apiUrl}${thumbnailPath}`, { 
+      headers,
+      responseType: 'blob' // WICHTIG: Bild als Binary-Blob anfordern
+    });
+  }
 }

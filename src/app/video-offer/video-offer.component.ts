@@ -196,11 +196,80 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
     }
   }
 
+  // loadVideos(): void {
+  //   if (this.authService.isLoggedIn()) {
+  //     this.videoService.getVideos().subscribe(
+  //       (data) => {
+  //         this.videos = data; // Speichere die Daten, die du vom Server bekommst
+  //       },
+  //       (err) => {
+  //         this.error = 'Fehler beim Laden der Videos'; // Fehlerbehandlung
+  //       }
+  //     );
+  //   } else {
+  //     this.error = 'Nicht autorisiert. Bitte logge dich ein.'; // Wenn nicht eingeloggt, Fehler ausgeben
+  //   }
+  // }
+
+  // loadVideos(): void {
+  //   if (this.authService.isLoggedIn()) {
+  //     this.videoService.getVideos().subscribe(
+  //       (data) => {
+  //         this.videos = data;
+
+  //         // Thumbnails für jedes Video laden
+  //         this.videos.forEach((genre: any) => {
+  //           genre.videos.forEach((movie: any) => {
+  //             this.videoService
+  //               .getThumbnailUrl(movie.thumbnail)
+  //               .subscribe((blob) => {
+  //                 const objectURL = URL.createObjectURL(blob);
+  //                 movie.thumbnailUrl = objectURL; // Speichern der Blob-URL
+  //               });
+  //           });
+  //         });
+  //       },
+  //       (err) => {
+  //         this.error = 'Fehler beim Laden der Videos';
+  //       }
+  //     );
+  //   } else {
+  //     this.error = 'Nicht autorisiert. Bitte logge dich ein.';
+  //   }
+  // }
+
+  
+
+
+
   loadVideos(): void {
     if (this.authService.isLoggedIn()) {
       this.videoService.getVideos().subscribe(
-        (data) => {
-          this.videos = data; // Speichere die Daten, die du vom Server bekommst
+        async (data) => {
+          console.log("Raw API Response:", data); // ✅ Check 1: Rohdaten vom Backend
+          
+          try {
+            this.videos = await Promise.all(
+              data.map(async (video: any) => {
+                const videosWithThumbnails = await Promise.all(
+                  video.videos.map(async (movie: any) => {
+                    try {
+                      const thumbnailUrl = await this.getThumbnailBlob(movie.thumbnail);
+                      return { ...movie, thumbnailUrl };
+                    } catch (error) {
+                      console.error("Error loading thumbnail for movie:", movie, error);
+                      return { ...movie, thumbnailUrl: '' }; // Setze leer, falls Fehler
+                    }
+                  })
+                );
+                return { ...video, videos: videosWithThumbnails };
+              })
+            );
+  
+            console.log("Processed Videos:", this.videos); // ✅ Check 2: Nach Verarbeitung
+          } catch (error) {
+            console.error("Error processing videos:", error);
+          }
         },
         (err) => {
           this.error = 'Fehler beim Laden der Videos'; // Fehlerbehandlung
@@ -209,5 +278,38 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
     } else {
       this.error = 'Nicht autorisiert. Bitte logge dich ein.'; // Wenn nicht eingeloggt, Fehler ausgeben
     }
+  }
+  
+
+  async getThumbnailBlob(thumbnail: string): Promise<string> {
+    // Entferne alle führenden Slashes von "thumbnail" (falls vorhanden)
+    const cleanedThumbnail = thumbnail.replace(/^\/+/, '');
+    const url = `${this.apiUrl}/${cleanedThumbnail}`;
+    console.log("Fetching Thumbnail:", url); // ✅ Check 3: URL stimmt?
+  
+    const headers = new Headers({
+      Authorization: `Bearer ${this.authService.getAccessToken()}`,
+    });
+  
+    try {
+      const response = await fetch(url, { headers });
+      console.log("Fetch Response:", response); // ✅ Check 4: API Antwort?
+  
+      if (!response.ok) {
+        console.error("Failed to fetch thumbnail", response.status);
+        throw new Error("Bild konnte nicht geladen werden");
+      }
+  
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error("Error fetching thumbnail:", error);
+      return ''; // Leerer String bei Fehler
+    }
+  }
+
+  // Hilfsfunktion zur Korrektur der URL
+  fixThumbnailUrl(thumbnail: string): string {
+    return `${this.apiUrl}/${thumbnail.replace(/^\/+/, '')}`;
   }
 }
