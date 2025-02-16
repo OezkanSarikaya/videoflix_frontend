@@ -19,6 +19,32 @@ export class VideoService {
     });
   }
 
+  async getVideoBlob(videoUrl: string): Promise<string> {
+    // console.log('getVideoBlob:'+videoUrl);
+    
+    const cleanedUrl = videoUrl.replace(/^\/+/, ''); // Entfernt führende Slashes
+    const fullUrl = `${this.apiUrl}${cleanedUrl}`;
+
+    const headers = new Headers({
+      Authorization: `Bearer ${this.authService.getAccessToken()}`,
+    });
+
+    try {
+      const response = await fetch(fullUrl, { headers });
+
+      if (!response.ok) {
+        console.error('Fehler beim Abrufen des Videos:', response.status);
+        throw new Error('Video konnte nicht geladen werden');
+      }
+
+      const blob = await response.blob();
+      return URL.createObjectURL(blob);
+    } catch (error) {
+      console.error('Fehler beim Laden des Videos:', error);
+      return '';
+    }
+  }
+
   getVideos(): Observable<any> {
     // return this.http.get(this.apiUrl + 'api/genres/videos/', {
       return this.http.get(`${this.apiUrl}api/genres/videos/`, {

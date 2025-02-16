@@ -45,7 +45,7 @@ export class AuthGuard implements CanActivate {
         .refreshToken()
         .toPromise()
         .then(() => {
-          console.log('✅ Refresh-Token erfolgreich, Zugriff erlaubt');
+          // console.log('✅ Refresh-Token erfolgreich, Zugriff erlaubt');
           return true;
         })
         .catch((err) => {

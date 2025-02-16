@@ -54,6 +54,8 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   isVideoDescriptionVisible = false;
   hasDismissedProgressToast: boolean = false;
   showRotateMessage = false;
+  videoUrl: string = '';
+  currentVideoFile: string = '';
 
   private intervalId: any; // Referenz für das Interval
   private isDestroyed = false;
@@ -408,14 +410,19 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     try {
       const data = await lastValueFrom(this.videoService.getVideoById(id));
 
+      // console.log('✅ Video geladen:', data.video_file);
+
       // Standardmäßig 720p hinzufügen, falls kein Suffix existiert
       if (!data.video_file.match(/_(120p|360p|720p|1080p)\.mp4$/)) {
         const filename = data.video_file.replace('.mp4', '_720p.mp4');
         data.video_file = filename;
       }
 
-      //   console.log('✅ Video geladen:', data.video_file);
+      // console.log('✅ Video geladen:', data.video_file);
+      this.currentVideoFile = data.video_file;
 
+      data.video_file = await this.videoService.getVideoBlob(data.video_file); //neu
+      
       this.videoData = data;
     } catch (error) {
       console.error('❌ Fehler beim Laden des Videos:', error);
@@ -471,7 +478,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
         this.progressService
           .saveProgress(parseInt(this.videoId), progress)
           .subscribe(
-            () => {}, 
+            () => {},
             // () => console.log('Progress saved successfully'),
             (error) => console.error('Error saving progress:', error)
           );
@@ -569,15 +576,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     }
   }
 
-  // enterFullscreen() {
-  //   const playerContainer = this.playerContainerRef.nativeElement;
-  //   if (playerContainer.requestFullscreen) {
-  //     playerContainer.requestFullscreen();
-  //   } else if ((playerContainer as any).webkitRequestFullscreen) {
-  //     (playerContainer as any).webkitRequestFullscreen();
-  //   }
-  // }
-
   toggleMute(): void {
     if (!this.target || !this.target.nativeElement) return;
     const video = this.target.nativeElement;
@@ -600,7 +598,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     this.setResolution(resolution);
   }
 
-  setResolution(resolution: string, resumeTime: number = 0): void {
+  async setResolution(resolution: string, resumeTime: number = 0): Promise<void> {
     // console.log('setResolution: ' + resumeTime);
 
     if (!this.target) return;
@@ -612,17 +610,23 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     // Speichere aktuelle Zeit
     const currentTime = video.currentTime;
 
-    // Ändere die Video-URL zur neuen Auflösung
-    const baseUrl = this.videoData.video_file.replace(
+    const baseUrl = this.currentVideoFile.replace(
       /_(120p|360p|720p|1080p)\.mp4$/,
       ''
     );
-    const newSrc = `${baseUrl}_${resolution}.mp4`;
+    let newSrc = `${baseUrl}_${resolution}.mp4`;
 
-    this.videoData.video_file = newSrc;
+    
+    newSrc = await this.videoService.getVideoBlob(newSrc); //neu
+    // const newSrc = await this.videoService.getVideoBlob(`${baseUrl}_${resolution}.mp4`);
+
+    // newSrc = await this.videoService.getVideoBlob(newSrc); //neu
+    
+    this.videoData.video_file = newSrc;    
 
     // Warte, bis Metadaten geladen sind, dann setze `currentTime`
     video.src = this.apiUrl + newSrc;
+    video.src = newSrc;
     video.load(); // Lade das neue Video
     // video.paused ? video.play() : video.pause();
     video.addEventListener(

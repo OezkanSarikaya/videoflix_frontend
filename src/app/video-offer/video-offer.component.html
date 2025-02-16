@@ -10,7 +10,7 @@
       loop
       #trailer
     >
-      <source [src]="this.apiUrl + trailerVideoUrl" type="video/mp4" />
+      <source [src]="trailerVideoUrl" type="video/mp4" />
     </video>
     <div class="gradient-overlay"></div>
   </div>
@@ -50,7 +50,8 @@
               (keydown)="handleKeydown($event)"
               (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
               (focusin)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
-            >
+            >     
+
               <img
                 [src]="movie.thumbnailUrl"
                 alt="{{ movie.title }}"
@@ -70,7 +71,7 @@
               (click)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
               (focusin)="setActiveThumbnail(movie.id); onVideoClick(movie.id)"
             >
-              <p>Thumbnail URL: {{ movie.thumbnailUrl || 'Fehler beim Laden' }}</p>
+           
               <img
                 *ngIf="movie.thumbnailUrl"
                 [src]="movie.thumbnailUrl"
@@ -80,6 +81,8 @@
             </div>
           </div>
         </div>
+
+
       </div>
 
       <div *ngIf="error" class="error-message">
