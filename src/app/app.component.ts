@@ -13,6 +13,7 @@ import { ToastService } from './services/toast/toast.service';
 })
 export class AppComponent implements AfterViewInit {
   @ViewChild(ToastComponent) toastComponent!: ToastComponent;
+  title = 'videoflix_frontend'; 
 
   constructor(private toastService: ToastService) {}
 

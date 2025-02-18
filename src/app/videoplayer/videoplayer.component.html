@@ -1,18 +1,11 @@
 <div class="wrapper">
   <div id="container" class="container" #container *ngIf="videoData">
-    <!-- <video
+    <video
       #target
       id="target"
-      [src]="apiUrl + videoData?.video_file"
+      [src]="videoData?.video_file"
       (timeupdate)="updateSeekbar()"
-    ></video> -->
-
-    <video
-    #target
-    id="target"
-    [src]="videoData?.video_file"
-    (timeupdate)="updateSeekbar()"
-  ></video>
+    ></video>
 
     <div class="overlay">
       <div class="topIcons">
@@ -27,7 +20,7 @@
           Optimizing video for your screen {{ bufferedPercent.toFixed() }}% /
           {{ bufferedTime.toFixed() }} sek. ({{ selectedResolution }})
         </div>
-        
+
         <div class="topRightIcons">
           <img
             src="../../assets/img/icons/logo-icon.png"
@@ -37,26 +30,22 @@
         </div>
       </div>
 
-
-
       <div class="mobileTopIcons">
         <div class="topLeftIcons">
-
           <img
-          src="../../assets/img/icons/logo-icon.png"
-          alt=""
-          routerLink="/videos/"
-        />
-        {{ videoData.title }}
+            src="../../assets/img/icons/logo-icon.png"
+            alt=""
+            routerLink="/videos/"
+          />
+          {{ videoData.title }}
         </div>
-    
-        
+
         <div class="topRightIcons">
           <img
-          src="../../assets/img/icons/close_small.png"
-          alt=""
-          routerLink="/videos/"
-        />
+            src="../../assets/img/icons/close_small.png"
+            alt=""
+            routerLink="/videos/"
+          />
         </div>
       </div>
 
@@ -70,29 +59,28 @@
       </div>
 
       <div class="mobileVideoControls">
-       
-      <img
-        src="../../assets/img/icons/replay_10.png"
-        alt=""
-        (click)="rewind(10)"
-      />
-      <img
-      *ngIf="target.paused"
-      src="../../assets/img/icons/play_arrow.png"
-      alt=""
-      (click)="toggleVideo()"
-    />
-    <img
-      *ngIf="!target.paused"
-      src="../../assets/img/icons/pause.png"
-      alt=""
-      (click)="toggleVideo()"
-    />
-      <img
-        src="../../assets/img/icons/forward_10.png"
-        alt=""
-        (click)="forward(10)"
-      />
+        <img
+          src="../../assets/img/icons/replay_10.png"
+          alt=""
+          (click)="rewind(10)"
+        />
+        <img
+          *ngIf="target.paused"
+          src="../../assets/img/icons/play_arrow.png"
+          alt=""
+          (click)="toggleVideo()"
+        />
+        <img
+          *ngIf="!target.paused"
+          src="../../assets/img/icons/pause.png"
+          alt=""
+          (click)="toggleVideo()"
+        />
+        <img
+          src="../../assets/img/icons/forward_10.png"
+          alt=""
+          (click)="forward(10)"
+        />
       </div>
 
       <div class="bottom-controls">
@@ -109,15 +97,13 @@
           >
         </div>
 
-
         <div class="mobileBottomIcons">
-  
           <img
             src="../../assets/img/icons/speed.png"
             alt=""
             (click)="toggleResolutionPopup()"
-          /> Speed
-
+          />
+          Speed
         </div>
 
         <div class="bottomIcons">
@@ -157,12 +143,13 @@
               (click)="toggleMute()"
             />
             <input
-            type="range"
-            [(ngModel)]="volume" 
-            (input)="updateVolume(target)"
-            step="0.1" min="0" max="1"
-          />
-
+              type="range"
+              [(ngModel)]="volume"
+              (input)="updateVolume(target)"
+              step="0.1"
+              min="0"
+              max="1"
+            />
           </div>
           <div class="middleTitle">{{ videoData.title }}</div>
           <div class="rightIcons">
@@ -206,13 +193,4 @@
       </div>
     </div>
   </div>
-
-
-
-  <div *ngIf="showRotateMessage" class="rotate-message">
-    📱 Bitte drehen Sie Ihr Gerät in den Landscape-Modus, um das Video zu sehen.
-  </div>
-
-
-
 </div>

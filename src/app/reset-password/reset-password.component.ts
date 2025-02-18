@@ -5,7 +5,7 @@ import { FormsModule, NgForm } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../app/services/auth.service'; 
-import { log } from 'console';
+// import { log } from 'console';
 
 @Component({
   selector: 'app-reset-password',

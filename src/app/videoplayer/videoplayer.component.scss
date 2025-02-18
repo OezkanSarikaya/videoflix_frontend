@@ -1,5 +1,4 @@
 .wrapper {
-  // background-color: black;
   height: 100vh;
   display: flex;
   justify-content: center;
@@ -239,14 +238,6 @@ h1 {
   display: none;
 }
 
-.rotate-message {
-  text-align: center;
-  font-size: 18px;
-  padding: 20px;
-  background: #2e3edf;
-  border-radius: 10px;
-  margin: 20px;
-}
 
 @media only screen and (max-width: 768px) {
   .max-width {
