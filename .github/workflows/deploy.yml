@@ -1,0 +1,40 @@
+name: CI/CD Pipeline for Angular Frontend
+
+on:
+  push:
+    branches:
+      - main  # Passe dies an deine Haupt-Branch an
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: 📦 Install Dependencies
+        run: npm install
+
+      - name: 📝 Create Environment File
+        run: |
+          mkdir -p src/app/environment
+          echo "export const environment = { apiUrl: '${{ secrets.API_URL }}' };" > src/app/environment/environment.ts
+
+      - name: 🧪 Run Unit Tests
+        run: npm run test -- --watch=false --browsers=ChromeHeadless
+
+      - name: 🏗️ Build Angular App
+        run: npm run build -- --configuration production
+
+      - name: 🚀 Deploy to Netbuild via SSH (rsync)
+        if: success()
+        run: |
+          echo "${{ secrets.SSH_KEY }}" > private_key && chmod 600 private_key
+          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/path/to/your/netbuild-folder/
+          rm -f private_key
