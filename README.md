@@ -36,7 +36,7 @@ npm install
 
 ### 3️⃣ Create Configuration File
 
-Create the folder `src/app/environment` and add a file `environment.ts` with the following content:
+Create the folder `src/app/environment` and add a file `environment.ts` with the following content: 
 
 ```typescript
 export const environment = { 
