@@ -45,19 +45,13 @@ export class AuthGuard implements CanActivate {
         .refreshToken()
         .toPromise()
         .then(() => {
-          // console.log('✅ Refresh-Token erfolgreich, Zugriff erlaubt');
           return true;
         })
         .catch((err) => {
-          // console.error(
-          //   '❌ Refresh-Token fehlgeschlagen, weiter zu /login',
-          //   err
-          // );
           this.router.navigate(['/login']);
           return false;
         });
     } else {
-      // console.log('🚪 Nicht eingeloggt, weiter zu /login');
       this.router.navigate(['/login']);
       return false;
     }

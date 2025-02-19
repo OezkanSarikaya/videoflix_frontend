@@ -430,10 +430,11 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
   updateVolume(target: HTMLVideoElement): void {
     target.volume = this.volume; // Setze die Lautstärke des Video-Players
+    const video = this.target.nativeElement;
     if (this.volume == 0) {
       this.isMuted = true;
+      video.muted = true;
     } else {
-      const video = this.target.nativeElement;
       video.muted = false;
       this.isMuted = false;
     }

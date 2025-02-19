@@ -5,8 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FooterComponent } from '../shared/footer/footer.component';
 import { HeaderComponent } from '../shared/header/header.component';
 import { AuthService } from '../services/auth.service';
-// import { log } from 'console';
-import { RouterLink, RouterOutlet } from '@angular/router';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-activate',
@@ -34,10 +33,8 @@ export class ActivateComponent {
 
     // Sicherstellen, dass beide Werte vorhanden sind
     if (uid && token) {
-      console.log('UID:', uid, 'Token:', token);
       this.authService.activateAccount(uid, token).subscribe({
         next: () => {
-          console.log('Activation successful');
           this.activationStatus = 'success';
           this.message = 'Your account was successfully activated!';
         },
@@ -49,8 +46,8 @@ export class ActivateComponent {
         },
       });
     } else {
-      console.log('UID or Token is missing');
       this.activationStatus = 'error';
+      this.message = '';
     }
   }
 }

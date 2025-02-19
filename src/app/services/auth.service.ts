@@ -42,7 +42,6 @@ export class AuthService {
     const timeout = expiresAt - Date.now() - 60000; // 1 Minute vor Ablauf
 
     if (timeout > 0) {
-      // console.log(`🕒 Timer wird in ${timeout / 1000} Sekunden ausgelöst`);
       this.refreshTokenTimeout = setTimeout(() => {
         this.refreshToken().subscribe();
       }, timeout);
@@ -167,7 +166,6 @@ export class AuthService {
       .pipe(
         tap({
           next: (tokens) => {
-            // console.log('✅ Refresh erfolgreich:', tokens);
             const rememberme = !!localStorage.getItem('accessToken');
             this.storeTokens(tokens, rememberme);
             this.startRefreshTokenTimer();

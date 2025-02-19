@@ -34,8 +34,6 @@ export class VideoService {
       '$1'
     );
 
-    // console.log('🔍 Fetching video:', fullUrl);
-
     try {
       const blob = await lastValueFrom(
         this.http
@@ -50,7 +48,6 @@ export class VideoService {
       const blobUrl = URL.createObjectURL(videoBlob);
 
       (window as any).lastBlobURL = blobUrl; // Für Debugging
-      // console.log('✔ Blob gespeichert:', blobUrl);
 
       return blobUrl;
     } catch (error) {

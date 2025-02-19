@@ -13,7 +13,6 @@ import { AuthService } from '../../app/services/auth.service'; // Dein AuthServi
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../environment/environment';
-// import { log } from 'console';
 
 @Component({
   selector: 'app-video-offer',
@@ -142,8 +141,6 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
     if (this.authService.isLoggedIn()) {
       this.videoService.getVideosWithProgress().subscribe(
         async (data) => {
-          // console.log("API Response:", data); // Debugging
-
           if (!data || !Array.isArray(data)) {
             console.error('Unexpected API response format:', data);
             this.error =
@@ -169,8 +166,6 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
                 }
               })
             );
-
-            // console.log("Processed Videos with Progress:", this.videosWithProgress); // Debugging
           } catch (error) {
             console.error('Error processing videos with progress:', error);
           }
@@ -197,55 +192,7 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
     return `${fileName}${suffix}${extension}`;
   }
 
-
-  // onVideoClick(videoId: number): void {
-  //   const isMobile = window.innerWidth < 600;
-  //   const videoPreview = document.querySelector('.video-preview') as HTMLElement;
-  //   const videoContent = document.querySelector('.video-content') as HTMLElement;
-  //   const videoOverlay = document.querySelector('.video-overlay') as HTMLElement;
-  
-  //   if (isMobile) {
-  //     videoPreview?.setAttribute('style', 'display: unset;');
-  //     videoOverlay?.setAttribute('style', 'display: unset;');
-  //     videoContent?.classList.add('hidden');
-  //   } else {
-  //     videoContent?.classList.remove('hidden');
-  //   }
-  
-  //   const movie = this.videos
-  //     .flatMap((video) => video.videos)
-  //     .find((v) => v.id === videoId);
-  
-  //   if (movie) {
-  //     this.trailerTitle = movie.title;
-  //     this.trailerId = movie.id;
-  //     this.trailerDescription = movie.description;
-  
-  //     const originalUrl = movie.video_file;
-  //     const modifiedUrl = this.modifyVideoUrl(originalUrl, '_720p');
-  
-  //     // 💡 Jetzt mit `subscribe()` statt `then()`
-  //     this.videoService.getVideoBlob(modifiedUrl).subscribe({
-  //       next: (blobUrl) => {
-  //         if (blobUrl) {
-  //           this.trailerVideoUrl = blobUrl;
-  //           setTimeout(() => {
-  //             this.trailerVideoElement.nativeElement.load();
-  //           }, 0);
-  //         } else {
-  //           console.error('⚠ Fehler: Blob-URL konnte nicht generiert werden');
-  //         }
-  //       },
-  //       error: (error) => {
-  //         console.error('Fehler beim Laden des Videos:', error);
-  //       }
-  //     });
-  //   }
-  // }
-  
-
   onVideoClick(videoId: number): void {
-    // console.log('onVideoClick: '+videoId);
     const isMobile = window.innerWidth < 600;
     const videoPreview = document.querySelector(
       '.video-preview'
@@ -268,7 +215,6 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
     const movie = this.videos
       .flatMap((video) => video.videos)
       .find((v) => v.id === videoId);
-    // console.log('onVideoClick movie: '+movie);
 
     if (movie) {
       this.trailerTitle = movie.title;
@@ -276,7 +222,7 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
       this.trailerDescription = movie.description;
 
       const originalUrl = movie.video_file;
-      const modifiedUrl = this.modifyVideoUrl(originalUrl, '_720p');
+      const modifiedUrl = this.modifyVideoUrl(originalUrl, '_360p');
       // 💡 Jetzt wird die Methode aus dem VideoService verwendet!
       this.videoService
         .getVideoBlob(modifiedUrl)
@@ -295,9 +241,6 @@ export class VideoOfferComponent implements OnInit, OnDestroy {
         });
     }
   }
-
-
-
 
   loadVideos(): Promise<void> {
     return new Promise((resolve, reject) => {

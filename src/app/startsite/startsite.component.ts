@@ -11,7 +11,7 @@ import { ToastService } from './../services/toast/toast.service';
   standalone: true,
   imports: [FooterComponent, HeaderComponent, FormsModule, CommonModule],
   templateUrl: './startsite.component.html',
-  styleUrl: './startsite.component.scss'
+  styleUrl: './startsite.component.scss',
 })
 export class StartsiteComponent {
   email: string = '';
@@ -19,18 +19,18 @@ export class StartsiteComponent {
   constructor(private router: Router, private toastService: ToastService) {}
 
   goToSignup() {
-    if (this.email && !this.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-      // alert('Bitte eine gültige E-Mail eingeben!');
-      this.toastService.showToast(
-        'Bitte eine gültige E-Mail eingeben!',
-        false
-      );
+    if (
+      this.email &&
+      !this.email.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    ) {
+      this.toastService.showToast('Bitte eine gültige E-Mail eingeben!', false);
       return;
     }
 
     // Navigiere zur Signup-Seite mit oder ohne E-Mail als Parameter
-    const queryParams = this.email ? { queryParams: { email: this.email } } : {};
+    const queryParams = this.email
+      ? { queryParams: { email: this.email } }
+      : {};
     this.router.navigate(['/signup'], queryParams);
   }
-
 }
