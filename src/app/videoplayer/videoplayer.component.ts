@@ -321,7 +321,11 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
 
       this.videoData = data;
     } catch (error) {
-      console.error('loadVideoData: ❌ Fehler beim Laden des Videos:', error);
+      // console.error('loadVideoData: ❌ Fehler beim Laden des Videos:', error);
+      this.toastService.showToast(
+        `❌ Fehler beim Laden des Videos`,
+        false
+      );
     }
   }
 
@@ -429,7 +433,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
   }
 
   updateVolume(target: HTMLVideoElement): void {
-    target.volume = this.volume; // Setze die Lautstärke des Video-Players
+    // target.volume = this.volume; // Setze die Lautstärke des Video-Players
     const video = this.target.nativeElement;
     if (this.volume == 0) {
       this.isMuted = true;
@@ -437,6 +441,7 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     } else {
       video.muted = false;
       this.isMuted = false;
+      target.volume = this.volume; 
     }
   }
 

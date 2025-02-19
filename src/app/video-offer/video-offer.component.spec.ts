@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { HttpClientTestingModule } from '@angular/common/http/testing';  // HttpClientMocking
+import { ActivatedRoute } from '@angular/router'; // ActivatedRoute importieren
+import { of } from 'rxjs';  // Um ein mock Observable zu erzeugen
 import { VideoOfferComponent } from './video-offer.component';
 
 describe('VideoOfferComponent', () => {
@@ -8,9 +10,21 @@ describe('VideoOfferComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [VideoOfferComponent]
-    })
-    .compileComponents();
+      imports: [
+        VideoOfferComponent,       // Deine Komponente
+        HttpClientTestingModule,   // HttpClientMocking
+      ],
+      providers: [
+        {
+          provide: ActivatedRoute,  // Mock der ActivatedRoute
+          useValue: { 
+            snapshot: { 
+              queryParams: { uid: '123', token: 'abc' }  // Beispiel-Query-Parameter
+            } 
+          }
+        }
+      ]
+    }).compileComponents();
     
     fixture = TestBed.createComponent(VideoOfferComponent);
     component = fixture.componentInstance;
