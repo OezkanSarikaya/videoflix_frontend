@@ -32,7 +32,7 @@ jobs:
       - name: 🏗️ Build Angular  App
         run: npm run build -- --configuration production
 
-      - name: 🚀 Deploy to Netbuild via SSH (rsync)
+      - name: 🚀 Deploy to Netbuild via SSH  (rsync)
         if: success()
         run: |
           echo "${{ secrets.SSH_KEY }}" > private_key && chmod 600 private_key
