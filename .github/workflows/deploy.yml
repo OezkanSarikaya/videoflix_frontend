@@ -39,7 +39,7 @@ jobs:
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_KEY }}
           protocol: ftp
-          local-dir: "dist/videoflix_frontend/browser/*"
+          local-dir: "dist/videoflix_frontend/browser/"
           server-dir: "/var/www/vhosts/web-design-marketing.de/videoflix/"
           passive: true
 
