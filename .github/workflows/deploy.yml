@@ -47,6 +47,7 @@ jobs:
           debug: true
           # security: "loose"  # Ermöglicht passive FTP-Verbindungen
           timeout: 600      # Erhöht das Timeout auf 60 Sekunden
+          insecure: true
 
 
         ## rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
