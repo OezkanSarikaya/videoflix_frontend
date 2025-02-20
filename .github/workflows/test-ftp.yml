@@ -11,7 +11,7 @@ jobs:
       - name: 📥 Checkout Repository (nicht unbedingt nötig)
         uses: actions/checkout@v3
 
-      - name: ℹ️ Debug: Zeige Umgebungsvariablen
+      - name: Debug Zeige Umgebungsvariablen
         run: env | sort
 
       - name: 🛠 Installiere FTP-Clients
