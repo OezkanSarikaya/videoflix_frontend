@@ -1,7 +1,9 @@
 name: Test FTP Connection
 
 on:
-  workflow_dispatch: # Startet nur manuell über GitHub Actions
+  push:
+    branches:
+      - main  # Passe dies an deine Haupt-Branch an
 
 jobs:
   test-ftp:
