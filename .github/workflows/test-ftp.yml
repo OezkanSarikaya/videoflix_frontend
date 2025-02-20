@@ -36,7 +36,7 @@ jobs:
           EOF
 
       # 3️⃣ Test mit lftp FTPS (Sichere Variante)
-      - name: 🔍 Test Verbindung mit lftp (FTPS)
+      - name: 🔍 Test Verbindung mit lftp (FTPS) 
         run: |
           echo "TEST FTP CONNECTION (lftp, FTPS)"
           lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ftps://$(echo "${{ secrets.FTP_HOST }}" | sed 's|^ftp://||') << EOF
