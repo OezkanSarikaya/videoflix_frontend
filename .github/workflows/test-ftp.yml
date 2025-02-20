@@ -28,6 +28,7 @@ jobs:
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
           set ssl:verify-certificate no
+          set ftp:use-host 0  # <<< WICHTIG: HOST-Befehl deaktivieren
           connect ${{ secrets.FTP_HOST }}
           ls
           bye
