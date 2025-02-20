@@ -41,11 +41,12 @@ jobs:
           server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_KEY }}
-          # protocol: ftp
+          protocol: ftp
           local-dir: "dist/videoflix_frontend/browser/"
           server-dir: "/var/www/vhosts/web-design-marketing.de/videoflix/"
+          debug: true
           # security: "loose"  # Ermöglicht passive FTP-Verbindungen
-          # timeout: 60000      # Erhöht das Timeout auf 60 Sekunden
+          timeout: 600      # Erhöht das Timeout auf 60 Sekunden
 
 
         ## rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
