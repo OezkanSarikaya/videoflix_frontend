@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Test Secret in Action
-        run: echo "TEST_SECRET is ${{ secrets.TEST_SECRET }}"  
+        run: echo "TEST_SECRET is ${{ secrets.TEST_SECRET }}"
 
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v3
@@ -35,14 +35,20 @@ jobs:
       - name: 🏗️ Build Angular App
         run: npm run build -- --configuration production
 
+      # SSH Known Hosts hinzufügen
+      - name: Add SSH known hosts
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KNOWN_HOSTS }}" >> ~/.ssh/known_hosts
+          chmod 644 ~/.ssh/known_hosts
+
+      # SSH Private Key hinzufügen
+      - name: "Add SSH private key"
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
       - name: 🚀 Deploy to Server via SSH
-        uses: appleboy/ssh-action@v0.1.10
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
-          port: 22
-          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
-          script: |
-            echo "Deploying to production server"
-            rsync -avz --delete dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
+        run: |
+          rsync -avz -e "ssh -i ~/.ssh/id_rsa -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
