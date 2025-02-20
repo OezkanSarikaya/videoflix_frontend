@@ -10,8 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📥 Checkout  Repository
+      - name: 📥 Checkout Repository
         uses: actions/checkout@v3
+
+      - name: Test Secret in Action
+        run: echo "TEST_SECRET is ${{ secrets.TEST_SECRET }}"  
 
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v3
@@ -37,8 +40,9 @@ jobs:
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
-          key: ${{ secrets.SSH_KEY }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
+          known_hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
           script: |
             echo "Deploying to production server"
             rsync -avz --delete dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
