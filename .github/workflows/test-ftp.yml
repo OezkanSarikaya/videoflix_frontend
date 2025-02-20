@@ -15,12 +15,13 @@ jobs:
 
       - name: 🔍 Test Verbindung mit lftp (Explizites FTPS, Zertifikat ignorieren)
         run: |
-          echo "TEST FTP CONNECTION (lftp, Explicit FTPS, ignore cert)"
-          lftp -d ${{ secrets.FTP_HOST }} -u ${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }} << EOF
+          echo "FTP_USER: ${{ secrets.FTP_USER }}"
+          lftp -d "${{ secrets.FTP_HOST }}" -u "${{ secrets.FTP_USER }}",${{ secrets.FTP_KEY }} << EOF
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
           set ssl:verify-certificate no
-          open ${{ secrets.FTP_HOST }}
+          open "${{ secrets.FTP_HOST }}"
           ls
           bye
           EOF
+
