@@ -1,0 +1,55 @@
+name: Test FTP Connection
+
+on:
+  workflow_dispatch: # Manuell in GitHub Actions starten
+
+jobs:
+  test-ftp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Repository (nicht unbedingt nötig)
+        uses: actions/checkout@v3
+
+      - name: ℹ️ Debug: Zeige Umgebungsvariablen
+        run: env | sort
+
+      - name: 🛠 Installiere FTP-Clients
+        run: sudo apt-get update && sudo apt-get install -y lftp ftp
+
+      # 1️⃣ Test mit einfachem FTP-Befehl
+      - name: 🔍 Test Verbindung mit ftp (Unsicher, nur zum Debuggen)
+        run: |
+          echo "TEST FTP CONNECTION (Plain FTP)"
+          ftp -v -d -p ${{ secrets.FTP_HOST }} << EOF
+          user ${{ secrets.FTP_USER }} ${{ secrets.FTP_KEY }}
+          quit
+          EOF
+
+      # 2️⃣ Test mit lftp (Sicherer, besser für Debugging)
+      - name: 🔍 Test Verbindung mit lftp (FTP)
+        run: |
+          echo "TEST FTP CONNECTION (lftp, Plain FTP)"
+          lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ${{ secrets.FTP_HOST }} << EOF
+          ls
+          bye
+          EOF
+
+      # 3️⃣ Test mit lftp FTPS (Sichere Variante)
+      - name: 🔍 Test Verbindung mit lftp (FTPS)
+        run: |
+          echo "TEST FTP CONNECTION (lftp, FTPS)"
+          lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ftps://$(echo "${{ secrets.FTP_HOST }}" | sed 's|^ftp://||') << EOF
+          ls
+          bye
+          EOF
+
+      # 4️⃣ Test mit lftp FTPS + Zertifikat ignorieren
+      - name: 🔍 Test Verbindung mit lftp (FTPS, ohne Zertifikat-Check)
+        run: |
+          echo "TEST FTP CONNECTION (lftp, FTPS, ignore cert)"
+          lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ftps://$(echo "${{ secrets.FTP_HOST }}" | sed 's|^ftp://||') << EOF
+          set ssl:verify-certificate no
+          ls
+          bye
+          EOF
