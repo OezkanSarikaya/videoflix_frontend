@@ -26,20 +26,20 @@ jobs:
           mkdir -p src/app/environment
           echo "export const environment = { apiUrl: '${{ secrets.API_URL }}' };" > src/app/environment/environment.ts
 
-      - name: 🧪 Run Unit Tests 
+      - name: 🧪 Run Unit Tests
         run: npm run test -- --watch=false --browsers=ChromeHeadless
 
       - name: 🏗️ Build Angular App
         run: npm run build -- --configuration production
 
-      - name: 📡 Check GitHub Runner IP
-        run: curl ifconfig.me
+      - name: 🚀 Deploy to Netbuild via SFTP
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_KEY }}
+          source: "dist/videoflix_frontend/browser/*"
+          target: "/var/www/vhosts/web-design-marketing.de/videoflix/"
 
-      - name: 🚀 Deploy to Netbuild via SSH  (rsync)
-        if: success()
-        run: |
-          echo "${{ secrets.SSH_KEY }}" > private_key && chmod 600 private_key
-          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
-          rm -f private_key
 
         ## rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
