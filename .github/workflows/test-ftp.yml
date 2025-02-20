@@ -13,47 +13,14 @@ jobs:
       - name: 🛠 Installiere FTP-Clients
         run: sudo apt-get update && sudo apt-get install -y lftp ftp
 
-      # - name: 🔍 Test Verbindung mit FTP (Unsicher, nur Debugging)
-      #   run: |
-      #     echo "TEST FTP CONNECTION (Plain FTP)"
-      #     ftp -inv ${{ secrets.FTP_HOST }} << EOF
-      #     user ${{ secrets.FTP_USER }} ${{ secrets.FTP_KEY }}
-      #     bye
-      #     EOF
-
       - name: 🔍 Test Verbindung mit lftp (Explizites FTPS, Zertifikat ignorieren)
         run: |
           echo "TEST FTP CONNECTION (lftp, Explicit FTPS, ignore cert)"
-          lftp -d ${{ secrets.FTP_HOST }} -u ${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }} << EOF
+          lftp -d -u ${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }} << EOF
           set ftp:ssl-force true
           set ftp:ssl-protect-data true
           set ssl:verify-certificate no
-          open ${{ secrets.FTP_HOST }}
+          open ftp://${{ secrets.FTP_HOST }}  # Hier sicherstellen, dass das Protokoll angegeben wird
           ls
           bye
           EOF
-
-      # - name: 🔍 Test Verbindung mit lftp (FTP)
-      #   run: |
-      #     echo "TEST FTP CONNECTION (lftp, Plain FTP)"
-      #     lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ${{ secrets.FTP_HOST }} << EOF
-      #     ls
-      #     bye
-      #     EOF
-
-      # - name: 🔍 Test Verbindung mit lftp (FTPS)
-      #   run: |
-      #     echo "TEST FTP CONNECTION (lftp, FTPS)"
-      #     lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ftps://$(echo "${{ secrets.FTP_HOST }}" | sed 's|^ftp://||') << EOF
-      #     ls
-      #     bye
-      #     EOF
-
-      # - name: 🔍 Test Verbindung mit lftp (FTPS, Zertifikat ignorieren)
-      #   run: |
-      #     echo "TEST FTP CONNECTION (lftp, FTPS, ignore cert)"
-      #     lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ftps://$(echo "${{ secrets.FTP_HOST }}" | sed 's|^ftp://||') << EOF
-      #     set ssl:verify-certificate no
-      #     ls
-      #     bye
-      #     EOF
