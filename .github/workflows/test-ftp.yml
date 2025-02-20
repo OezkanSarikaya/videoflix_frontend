@@ -21,6 +21,15 @@ jobs:
           bye
           EOF
 
+      - name: 🔍 Test Verbindung mit lftp (FTPS, Zertifikat ignorieren)
+        run: |
+          echo "TEST FTP CONNECTION (lftp, FTPS, ignore cert)"
+          lftp -d -u "${{ secrets.FTP_USER }},${{ secrets.FTP_KEY }}" ftps://$(echo "${{ secrets.FTP_HOST }}" | sed 's|^ftp://||') << EOF
+          set ssl:verify-certificate no
+          ls
+          bye
+          EOF
+
       - name: 🔍 Test Verbindung mit lftp (FTP)
         run: |
           echo "TEST FTP CONNECTION (lftp, Plain FTP)"
