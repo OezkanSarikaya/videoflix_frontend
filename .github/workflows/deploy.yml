@@ -32,6 +32,9 @@ jobs:
       - name: 🏗️ Build Angular  App
         run: npm run build -- --configuration production
 
+      - name: 📡 Check GitHub Runner IP
+        run: curl ifconfig.me
+
       - name: 🚀 Deploy to Netbuild via SSH  (rsync)
         if: success()
         run: |
