@@ -35,9 +35,8 @@ jobs:
       - name: 🚀 Deploy to Netbuild via SSH (rsync)
         if: success()
         run: |
-          echo "${{ secrets.SSH_KEY }}" > private_key && chmod 600 private_key          
-          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
-
+          echo "${{ secrets.SSH_KEY }}" > private_key && chmod 600 private_key
+          rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/path/to/your/netbuild-folder/
           rm -f private_key
 
         ## rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
