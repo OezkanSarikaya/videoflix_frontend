@@ -32,14 +32,16 @@ jobs:
       - name: 🏗️ Build Angular App
         run: npm run build -- --configuration production
 
-      - name: 🚀 Deploy to Netbuild via SFTP
-        uses: appleboy/scp-action@v0.1.4
+      - name: 🚀 Deploy to Netbuild via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4
         with:
-          host: ${{ secrets.FTP_HOST }}
+          server: ${{ secrets.FTP_HOST }}
           username: ${{ secrets.FTP_USER }}
           password: ${{ secrets.FTP_KEY }}
-          source: "dist/videoflix_frontend/browser/*"
-          target: "/var/www/vhosts/web-design-marketing.de/videoflix/"
+          protocol: ftp
+          local-dir: "dist/videoflix_frontend/browser/*"
+          server-dir: "/var/www/vhosts/web-design-marketing.de/videoflix/"
+          passive: true
 
 
         ## rsync -avz -e "ssh -i private_key -o StrictHostKeyChecking=no" dist/videoflix_frontend/browser/ ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/vhosts/web-design-marketing.de/videoflix/
