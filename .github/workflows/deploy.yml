@@ -13,9 +13,6 @@ jobs:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Test Secret in Action
-        run: echo "TEST_SECRET is ${{ secrets.TEST_SECRET }}"
-
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v3
         with:
