@@ -476,11 +476,6 @@ export class VideoplayerComponent implements AfterViewInit, OnInit, OnDestroy {
     const video = this.target.nativeElement;
     video.muted = !video.muted;
     this.isMuted = video.muted;
-    // if (video.muted) {
-    //   this.volume = 0;
-    // } else {
-    //   this.volume = 0.5;
-    // }
   }
 
   toggleResolutionPopup(): void {
